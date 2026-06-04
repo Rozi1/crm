@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+.env
+crm.db
+uploads/
+*.bat
+.git
