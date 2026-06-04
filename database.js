@@ -105,12 +105,21 @@ function initDatabase() {
   ins.run('leads_per_period', '15');
   ins.run('period_split_hour', '12');
 
-  const adminExists = db.prepare("SELECT id FROM users WHERE role = 'admin'").get();
+  // One-time migration: promote all existing admins to superadmin if no superadmin exists yet
+  const superAdminExists = db.prepare("SELECT id FROM users WHERE role = 'superadmin'").get();
+  if (!superAdminExists) {
+    const promoted = db.prepare("UPDATE users SET role='superadmin' WHERE role='admin'").run();
+    if (promoted.changes > 0) {
+      console.log(`Migrated ${promoted.changes} admin account(s) to superadmin role.`);
+    }
+  }
+
+  const adminExists = db.prepare("SELECT id FROM users WHERE role IN ('admin', 'superadmin')").get();
   if (!adminExists) {
     const hash = bcrypt.hashSync('Admin@123', 10);
-    db.prepare("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, 'admin')")
+    db.prepare("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, 'superadmin')")
       .run('admin', hash, 'System Administrator');
-    console.log('Default admin created — username: admin | password: Admin@123');
+    console.log('Default superadmin created — username: admin | password: Admin@123');
     console.log('IMPORTANT: Change the default password immediately!');
   }
 

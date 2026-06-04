@@ -647,6 +647,7 @@ document.addEventListener('dragstart',e=>{if(e.target.closest('.lead-protected')
 (function init(){
   if(!token){window.location.href='/';return;}
   const user=getUser();if(!user){window.location.href='/';return;}
+  if(user.role==='admin'||user.role==='superadmin'){window.location.href='/admin';return;}
   const name=user.full_name||user.username;
   document.getElementById('sb-name').textContent=name;
   document.getElementById('sb-avatar').textContent=name.charAt(0).toUpperCase();

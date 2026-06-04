@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { getDB, transaction } = require('../database');
-const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdmin, requireSuperAdmin } = require('../middleware/auth');
 const { getClientIP } = require('../middleware/ipCheck');
 
 const router = express.Router();
@@ -81,9 +81,14 @@ router.get('/users', (req, res) => {
 router.post('/users', (req, res) => {
   const { username, password, full_name, role } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Username and password are required' });
+  const targetRole = role || 'agent';
+  // Only superadmin can create admin/superadmin accounts
+  if (req.user.role !== 'superadmin' && targetRole !== 'agent') {
+    return res.status(403).json({ error: 'Only Super Admin can create admin accounts' });
+  }
   try {
     const id = getDB().prepare("INSERT INTO users (username,password,full_name,role) VALUES (?,?,?,?)")
-      .run(username, bcrypt.hashSync(password, 10), full_name || username, role || 'agent').lastInsertRowid;
+      .run(username, bcrypt.hashSync(password, 10), full_name || username, targetRole).lastInsertRowid;
     res.json({ id, message: 'User created successfully' });
   } catch (e) {
     res.status(400).json({ error: e.message.includes('UNIQUE') ? 'Username already exists' : e.message });
@@ -295,7 +300,7 @@ router.put('/settings', (req, res) => {
 
 // ─── Super Admin: Permanent Delete User ──────────────────────────────────────
 
-router.delete('/users/:id/permanent', (req, res) => {
+router.delete('/users/:id/permanent', requireSuperAdmin, (req, res) => {
   const db = getDB();
   const user = db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
@@ -312,7 +317,7 @@ router.delete('/users/:id/permanent', (req, res) => {
 
 // ─── Super Admin: Reset Any User Password ─────────────────────────────────────
 
-router.put('/users/:id/password', (req, res) => {
+router.put('/users/:id/password', requireSuperAdmin, (req, res) => {
   const { password } = req.body;
   if (!password || password.length < 4) return res.status(400).json({ error: 'Password must be at least 4 characters' });
   const user = getDB().prepare('SELECT id, username FROM users WHERE id=?').get(req.params.id);
@@ -345,7 +350,7 @@ router.get('/agents/:id/leads', (req, res) => {
 
 // ─── Super Admin: Force Assign Leads to Any Agent ─────────────────────────────
 
-router.post('/leads/force-extract', (req, res) => {
+router.post('/leads/force-extract', requireSuperAdmin, (req, res) => {
   const { user_id, count, period } = req.body;
   if (!user_id || !count) return res.status(400).json({ error: 'user_id and count are required' });
   const db = getDB();

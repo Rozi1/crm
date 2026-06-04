@@ -20,8 +20,13 @@ function authenticateToken(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+  if (req.user.role !== 'admin' && req.user.role !== 'superadmin') return res.status(403).json({ error: 'Admin access required' });
   next();
 }
 
-module.exports = { authenticateToken, requireAdmin, JWT_SECRET };
+function requireSuperAdmin(req, res, next) {
+  if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Super Admin access required' });
+  next();
+}
+
+module.exports = { authenticateToken, requireAdmin, requireSuperAdmin, JWT_SECRET };

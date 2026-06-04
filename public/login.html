@@ -250,7 +250,7 @@ body{
 })();
 
 const _t=localStorage.getItem('crm_token'),_u=localStorage.getItem('crm_user');
-if(_t&&_u){try{const u=JSON.parse(_u);window.location.href=u.role==='admin'?'/admin':'/agent';}catch{}}
+if(_t&&_u){try{const u=JSON.parse(_u);window.location.href=(u.role==='admin'||u.role==='superadmin')?'/admin':'/agent';}catch{}}
 
 const SIGN_IN_HTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In`;
 const LOADING_HTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><circle cx="12" cy="12" r="9" stroke-dasharray="28" stroke-dashoffset="10"/></svg> Signing in…`;
@@ -274,7 +274,7 @@ document.getElementById('form').addEventListener('submit',async e=>{
     if(r.ok){
       localStorage.setItem('crm_token',d.token);
       localStorage.setItem('crm_user',JSON.stringify(d.user));
-      window.location.href=d.user.role==='admin'?'/admin':'/agent';
+      window.location.href=(d.user.role==='admin'||d.user.role==='superadmin')?'/admin':'/agent';
     }else{showErr(d.error||'Invalid credentials. Please check and try again.');}
   }catch{showErr('Connection error. Please ensure the server is running.');}
   btn.disabled=false;btn.innerHTML=SIGN_IN_HTML;

@@ -29,7 +29,7 @@ router.post('/login', (req, res) => {
 
   db.prepare('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?').run(user.id);
 
-  const expiresIn = user.role === 'admin' ? '48h' : '12h';
+  const expiresIn = (user.role === 'admin' || user.role === 'superadmin') ? '48h' : '12h';
   const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn });
   res.json({ token, user: { id: user.id, username: user.username, full_name: user.full_name, role: user.role } });
 });
