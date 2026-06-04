@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CRM — Agent Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f6ff;--sidebar:#fff;--card:#fff;--faint:#f8fafc;
+  --border:#e2e8f0;--border2:#f1f5f9;
+  --accent:#4338ca;--accent-light:#eef2ff;--accent-muted:#c7d2fe;
+  --accent-g:linear-gradient(135deg,#312e81,#4338ca,#6366f1);
+  --ok:#16a34a;--ok-bg:#f0fdf4;--ok-border:#bbf7d0;--ok-text:#166534;
+  --warn:#ca8a04;--warn-bg:#fefce8;--warn-border:#fde047;--warn-text:#854d0e;
+  --err:#dc2626;--err-bg:#fef2f2;--err-border:#fecaca;--err-text:#991b1b;
+  --info:#0369a1;--info-bg:#f0f9ff;--info-border:#bae6fd;--info-text:#075985;
+  --text:#0f172a;--text2:#334155;--muted:#64748b;--dim:#94a3b8;
+  --sh-sm:0 1px 3px rgba(15,23,42,.05),0 2px 6px rgba(15,23,42,.04);
+  --sh-md:0 4px 16px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.03);
+  --sh-lg:0 20px 50px rgba(15,23,42,.12),0 6px 16px rgba(15,23,42,.06);
+  --sb:248px;--radius:14px;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px;line-height:1.5}
+
+/* ── Sidebar ───────────────────────────────── */
+.sidebar{width:var(--sb);background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;box-shadow:2px 0 20px rgba(15,23,42,.07)}
+.sb-head{padding:22px 20px 20px;background:linear-gradient(160deg,#1e1b4b 0%,#312e81 30%,#4338ca 65%,#6366f1 100%);display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+.sb-head::before{content:'';position:absolute;top:-35px;right:-35px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+.sb-head::after{content:'';position:absolute;bottom:-50px;left:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none}
+.sb-badge{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+.sb-brand{font-size:14.5px;font-weight:800;color:#fff;letter-spacing:-.2px;position:relative;z-index:1}
+.sb-role{font-size:10px;color:rgba(255,255,255,.65);margin-top:1px;text-transform:uppercase;letter-spacing:.6px;position:relative;z-index:1}
+.sb-user{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fafbff,#f5f7ff)}
+.sb-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#312e81,#4338ca);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0;box-shadow:0 3px 8px rgba(67,56,202,.28)}
+.sb-uname{font-size:13px;font-weight:700;color:var(--text)}
+.sb-urole{font-size:10.5px;color:var(--muted)}
+nav{flex:1;padding:8px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);padding:12px 10px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;color:var(--muted);transition:all .15s;font-size:13px;font-weight:500;margin-bottom:2px;user-select:none;position:relative}
+.nav-item:hover{background:#eef2ff;color:var(--text2)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-item.active .ni{color:var(--accent);opacity:1}
+.ni{width:16px;height:16px;flex-shrink:0;opacity:.5;transition:opacity .15s;color:currentColor}
+.nav-item:hover .ni{opacity:.72}
+.sb-footer{padding:12px;border-top:1px solid var(--border);background:#fafbff}
+.btn-signout{width:100%;padding:9px 12px;background:#fff;color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.btn-signout:hover{background:var(--err-bg);color:var(--err);border-color:var(--err-border)}
+
+/* ── Main ──────────────────────────────────── */
+.main{margin-left:var(--sb);flex:1;min-height:100vh;overflow-y:auto;background:var(--bg)}
+.main-inner{padding:30px 34px;max-width:1200px}
+.ph{margin-bottom:24px}
+.ph-title{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-.6px}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.hidden{display:none!important}
+main section{animation:sec-fade .22s ease both}
+@keyframes sec-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Period Cards ──────────────────────────── */
+.period-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.period-card{background:var(--card);border:1.5px solid rgba(226,232,240,.8);border-radius:var(--radius);padding:24px;box-shadow:0 2px 8px rgba(15,23,42,.05),0 6px 18px rgba(15,23,42,.07);transition:box-shadow .22s,transform .22s;position:relative;overflow:hidden}
+.period-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-g);border-radius:14px 14px 0 0}
+.period-card:hover{box-shadow:0 10px 32px rgba(15,23,42,.12);transform:translateY(-2px)}
+.pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.pc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
+.pc-period-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted)}
+.pc-counts{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.pc-extracted{font-size:40px;font-weight:900;line-height:1;letter-spacing:-1.5px;color:var(--text)}
+.pc-max{font-size:16px;color:var(--muted);font-weight:500}
+.pc-label-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.bar-bg{background:#f1f5f9;border-radius:6px;height:7px;margin-bottom:18px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;background:var(--accent-g);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.period-card.pc-done{border-color:var(--ok-border)}
+.period-card.pc-done::before{background:linear-gradient(90deg,#15803d,#22c55e)}
+.period-card.pc-done .bar-fill{background:linear-gradient(90deg,#16a34a,#22c55e)}
+.extract-btn{width:100%;padding:11px;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.eb-can{background:var(--accent-g);color:#fff;box-shadow:0 3px 14px rgba(67,56,202,.32)}
+.eb-can:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 22px rgba(67,56,202,.42)}
+.eb-done{background:var(--ok-bg);color:var(--ok-text);border:1.5px solid var(--ok-border);cursor:default}
+.eb-wait{background:var(--faint);color:var(--dim);border:1.5px solid var(--border);cursor:default}
+
+/* ── Mini Stats ────────────────────────────── */
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:24px}
+.mini-card{background:var(--card);border:1.5px solid rgba(226,232,240,.8);border-radius:12px;padding:18px;text-align:center;box-shadow:0 2px 8px rgba(15,23,42,.05),0 4px 14px rgba(15,23,42,.06);transition:transform .22s,box-shadow .22s;position:relative;overflow:hidden}
+.mini-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px;background:var(--mc-accent,var(--accent-g))}
+.mini-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(15,23,42,.12)}
+.mc-val{font-size:30px;font-weight:900;line-height:1;letter-spacing:-.8px;margin-bottom:6px}
+.mc-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+
+/* ── Table ─────────────────────────────────── */
+.tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh-sm)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--faint);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border2);font-size:13px;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbff}
+.lead-row{cursor:pointer}
+.lead-row:hover td{background:var(--accent-light)!important}
+
+/* ── Badges ────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-ok{background:var(--ok-bg);color:var(--ok-text);border:1px solid var(--ok-border)}
+.b-warn{background:var(--warn-bg);color:var(--warn-text);border:1px solid var(--warn-border)}
+.b-blue{background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted)}
+.b-grey{background:var(--faint);color:var(--muted);border:1px solid var(--border)}
+.b-cyan{background:var(--info-bg);color:var(--info-text);border:1px solid var(--info-border)}
+
+/* ── Forms ─────────────────────────────────── */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;color:var(--muted);font-size:11.5px;font-weight:600;margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px}
+.form-control{width:100%;padding:10px 13px;background:var(--faint);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-control:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+textarea.form-control{resize:vertical;min-height:120px}
+select.form-control{cursor:pointer}
+.char-count{font-size:11px;color:var(--dim);text-align:right;margin-top:5px}
+
+/* ── Buttons ───────────────────────────────── */
+.btn{padding:10px 20px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 2px 10px rgba(67,56,202,.28)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 5px 18px rgba(67,56,202,.38)}
+.btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border);box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.btn-ghost:hover{color:var(--text);background:var(--faint);border-color:#cbd5e1}
+.btn-success{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.btn-success:hover{opacity:.9;transform:translateY(-1px)}
+.btn-sm{padding:6px 13px;font-size:12px;border-radius:7px}
+
+/* ── Form Card ─────────────────────────────── */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--sh-sm)}
+.form-card-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* ── Alerts ────────────────────────────────── */
+.alert{padding:11px 16px;border-radius:9px;font-size:13px;margin-bottom:16px;line-height:1.5;display:flex;align-items:flex-start;gap:9px}
+.alert-ok{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok-text)}
+.alert-err{background:var(--err-bg);border:1px solid var(--err-border);color:var(--err-text)}
+.alert-info{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info-text)}
+.alert-warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text)}
+
+/* ── Tabs ──────────────────────────────────── */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px}
+.tab{padding:9px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--text2)}
+
+/* ── Lead Modal ────────────────────────────── */
+.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);animation:fade-in .2s ease}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.lead-modal{background:#fff;border:1px solid rgba(226,232,240,.6);border-radius:20px;width:100%;max-width:480px;box-shadow:0 0 0 1px rgba(15,23,42,.04),0 32px 80px rgba(15,23,42,.18),0 8px 24px rgba(15,23,42,.08);animation:modal-up .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modal-up{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.lm-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.lm-head h3{font-size:16px;font-weight:700;color:var(--text)}
+.lm-close{background:none;border:none;color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.lm-close:hover{background:var(--err-bg);color:var(--err)}
+.lm-body{padding:20px 22px 24px}
+
+/* ── Lead Protected ────────────────────────── */
+.lead-protected{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}
+.lead-protected *{user-select:none;-webkit-user-select:none}
+.lead-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted);margin-bottom:16px;font-weight:600}
+.lead-field{margin-bottom:16px}
+.lf-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.lf-val{font-size:14px;font-weight:600;color:var(--text);letter-spacing:.1px;padding:11px 14px;background:var(--faint);border-radius:9px;border:1px solid var(--border);line-height:1.4}
+.lf-note{font-size:11px;color:var(--dim);text-align:center;padding-top:6px}
+
+/* ── Empty ─────────────────────────────────── */
+.empty{text-align:center;padding:44px 24px;color:var(--muted)}
+.empty-icon{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;background:var(--faint);border:1px solid var(--border);margin:0 auto 14px;color:var(--dim)}
+.empty p{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text2)}
+.empty small{font-size:12px;color:var(--muted)}
+
+/* ── Toast ─────────────────────────────────── */
+.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:13px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);display:flex;align-items:center;gap:10px;animation:toast-in .3s cubic-bezier(.34,1.56,.64,1);border-left:4px solid}
+.toast-ok{background:#fff;border-left-color:var(--ok);color:var(--ok-text)}
+.toast-err{background:#fff;border-left-color:var(--err);color:var(--err-text)}
+.toast-warn{background:#fff;border-left-color:var(--warn);color:var(--warn-text)}
+@keyframes toast-in{from{opacity:0;transform:translateX(20px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* ── Name Badge ────────────────────────────── */
+.name-badge{display:inline-flex;align-items:center;gap:8px}
+.nb-dot{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#4338ca,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-badge">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+    <div>
+      <div class="sb-brand">CRM Platform</div>
+      <div class="sb-role">Agent Portal</div>
+    </div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sb-avatar">A</div>
+    <div>
+      <div class="sb-uname" id="sb-name">Loading…</div>
+      <div class="sb-urole">Field Agent</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-sec="dashboard">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-section">My Work</div>
+    <div class="nav-item" data-sec="leads">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      My Leads
+    </div>
+    <div class="nav-item" data-sec="request">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+      Request Report
+    </div>
+    <div class="nav-item" data-sec="submit">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit Lead
+    </div>
+    <div class="nav-section">Records</div>
+    <div class="nav-item" data-sec="history">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      My History
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <button class="btn-signout" onclick="logout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<main class="main">
+<div class="main-inner">
+
+  <!-- DASHBOARD -->
+  <section id="sec-dashboard">
+    <div class="ph">
+      <div class="ph-title">My Dashboard</div>
+      <div class="ph-sub" id="dash-date">Loading today's summary…</div>
+    </div>
+    <div id="dash-alert"></div>
+    <div class="period-grid">
+      <div class="period-card" id="pc1">
+        <div class="pc-header">
+          <div class="pc-label">Period 1 — Morning</div>
+          <div class="pc-period-badge">AM</div>
+        </div>
+        <div class="pc-counts"><div class="pc-extracted" id="p1-val">—</div><div class="pc-max" id="p1-max">/ —</div></div>
+        <div class="pc-label-sub" id="p1-sub">leads extracted</div>
+        <div class="bar-bg"><div class="bar-fill" id="p1-bar" style="width:0%"></div></div>
+        <button class="extract-btn eb-wait" id="p1-btn" onclick="extractLeads(1)">Loading…</button>
+      </div>
+      <div class="period-card" id="pc2">
+        <div class="pc-header">
+          <div class="pc-label">Period 2 — Afternoon</div>
+          <div class="pc-period-badge">PM</div>
+        </div>
+        <div class="pc-counts"><div class="pc-extracted" id="p2-val">—</div><div class="pc-max" id="p2-max">/ —</div></div>
+        <div class="pc-label-sub" id="p2-sub">leads extracted</div>
+        <div class="bar-bg"><div class="bar-fill" id="p2-bar" style="width:0%"></div></div>
+        <button class="extract-btn eb-wait" id="p2-btn" onclick="extractLeads(2)">Loading…</button>
+      </div>
+    </div>
+    <div class="mini-stats">
+      <div class="mini-card"><div class="mc-val" style="color:#4f46e5" id="ms-total">—</div><div class="mc-lbl">Leads All Time</div></div>
+      <div class="mini-card"><div class="mc-val" style="color:#ca8a04" id="ms-pending">—</div><div class="mc-lbl">Pending Reports</div></div>
+      <div class="mini-card"><div class="mc-val" style="color:#16a34a" id="ms-fulfilled">—</div><div class="mc-lbl">Fulfilled Reports</div></div>
+    </div>
+    <div class="alert alert-info">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+      <span><strong>How it works:</strong> Click Extract in each period to receive your leads for that slot. View leads in <strong>My Leads</strong>. Use <strong>Request Report</strong> to ask admin for a credit report, or <strong>Submit Lead</strong> to send banking details.</span>
+    </div>
+  </section>
+
+  <!-- MY LEADS -->
+  <section id="sec-leads" class="hidden">
+    <div class="ph"><div class="ph-title">My Leads</div><div class="ph-sub">Click any lead to view full details</div></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+      <input type="date" id="leads-date" class="form-control" style="width:180px" onchange="loadMyLeads()">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('leads-date').value='';loadMyLeads()">Show All</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadMyLeads()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Refresh
+      </button>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Lead Name</th><th>Period</th><th>Extracted</th><th>Action</th></tr></thead>
+      <tbody id="leads-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Loading…</p></div></td></tr></tbody>
+    </table></div>
+  </section>
+
+  <!-- REQUEST REPORT -->
+  <section id="sec-request" class="hidden">
+    <div class="ph"><div class="ph-title">Request Report</div><div class="ph-sub">Submit customer details — admin will pull and upload the report for you</div></div>
+    <div id="req-alert"></div>
+    <div class="form-card">
+      <div class="form-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        New Report Request
+      </div>
+      <div class="form-group">
+        <label>Select Lead <span style="color:var(--dim);font-weight:400;text-transform:none">(optional)</span></label>
+        <select class="form-control" id="req-lead"><option value="">— Not linked to a specific lead —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Customer Details</label>
+        <textarea class="form-control" id="req-details" placeholder="Enter customer details: full name, home address, date of birth, phone number, National Insurance number…" oninput="updateCharCount('req-details','req-cc')"></textarea>
+        <div class="char-count" id="req-cc">0 characters</div>
+      </div>
+      <button class="btn btn-primary" onclick="submitReportRequest()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send to Admin
+      </button>
+    </div>
+  </section>
+
+  <!-- SUBMIT LEAD -->
+  <section id="sec-submit" class="hidden">
+    <div class="ph"><div class="ph-title">Submit Lead</div><div class="ph-sub">Submit lead details to admin for processing</div></div>
+    <div id="sub-alert"></div>
+    <div class="form-card">
+      <div class="form-card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Lead Submission
+      </div>
+      <div class="form-group">
+        <label>Select Lead <span style="color:var(--dim);font-weight:400;text-transform:none">(optional)</span></label>
+        <select class="form-control" id="sub-lead"><option value="">— Not linked to a specific lead —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Submission Details</label>
+        <textarea class="form-control" id="sub-details" placeholder="Enter the customer details: card information, bank details, account numbers, and any other relevant information…" oninput="updateCharCount('sub-details','sub-cc')"></textarea>
+        <div class="char-count" id="sub-cc">0 characters</div>
+      </div>
+      <button class="btn btn-primary" onclick="submitLead()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Submit to Admin
+      </button>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="sec-history" class="hidden">
+    <div class="ph"><div class="ph-title">My History</div><div class="ph-sub">Track your report requests and lead submissions</div></div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchHistTab('reports',this)">Report Requests</div>
+      <div class="tab" onclick="switchHistTab('submissions',this)">Lead Submissions</div>
+    </div>
+    <div id="hist-reports">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Date</th><th>Lead</th><th>Details</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="hist-rpts-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><p>Loading…</p></div></td></tr></tbody>
+      </table></div>
+    </div>
+    <div id="hist-submissions" class="hidden">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Date</th><th>Lead</th><th>Status</th><th>Admin Note</th></tr></thead>
+        <tbody id="hist-subs-tbody"><tr><td colspan="4"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><p>Loading…</p></div></td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<!-- ════════════════ LEAD MODAL ════════════════ -->
+<div id="lead-modal" class="modal-ov hidden" onclick="leadModalBgClick(event)">
+  <div class="lead-modal" id="lead-modal-box">
+    <div class="lm-head">
+      <h3>Lead Details</h3>
+      <button class="lm-close" onclick="closeLeadModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="lm-body lead-protected" id="lead-modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API='/api/agent';
+const token=localStorage.getItem('crm_token');
+let dashData=null;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function getUser(){try{return JSON.parse(localStorage.getItem('crm_user'));}catch{return null;}}
+function logout(){localStorage.removeItem('crm_token');localStorage.removeItem('crm_user');window.location.href='/';}
+async function api(path,opts={}){
+  opts.headers=Object.assign({Authorization:'Bearer '+token,'Content-Type':'application/json'},opts.headers||{});
+  if(opts.body&&typeof opts.body==='object'&&!(opts.body instanceof FormData))opts.body=JSON.stringify(opts.body);
+  const r=await fetch(path,opts);
+  if(r.status===401||r.status===403){logout();return null;}
+  if(r.status===503){showKillSwitchScreen();return null;}
+  return r;
+}
+
+function showKillSwitchScreen(){
+  document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f1f5f9;font-family:'Inter',sans-serif"><div style="text-align:center;padding:48px 40px;background:#fff;border-radius:20px;border:1px solid #fecaca;max-width:420px;box-shadow:0 20px 60px rgba(15,23,42,.12)"><div style="width:72px;height:72px;border-radius:20px;background:#fef2f2;border:1px solid #fecaca;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div><h2 style="color:#0f172a;margin-bottom:12px;font-size:22px;font-weight:800">System Offline</h2><p style="color:#64748b;font-size:14px;line-height:1.7">The system has been temporarily disabled by your administrator. Please try again later or contact your supervisor.</p><button onclick="logout()" style="margin-top:28px;padding:12px 28px;background:linear-gradient(135deg,#4338ca,#6366f1,#7c3aed);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;box-shadow:0 4px 16px rgba(79,70,229,.3)">Sign Out</button></div></div>`;
+}
+
+function fmt(dt){if(!dt)return '—';return new Date(dt).toLocaleString();}
+function fmtDate(dt){if(!dt)return '—';return new Date(dt).toLocaleDateString();}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function trunc(s,n=50){return s&&s.length>n?s.slice(0,n)+'…':(s||'—');}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+    const sec=el.dataset.sec;
+    document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('sec-'+sec).classList.remove('hidden');
+    if(sec==='dashboard')loadDashboard();
+    else if(sec==='leads')loadMyLeads();
+    else if(sec==='request')loadLeadsForSelect('req-lead');
+    else if(sec==='submit')loadLeadsForSelect('sub-lead');
+    else if(sec==='history')loadHistReports();
+  });
+});
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+async function loadDashboard(){
+  const r=await api(API+'/dashboard');if(!r)return;
+  dashData=await r.json();const d=dashData;
+  document.getElementById('dash-date').textContent='Today — '+new Date(d.today).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('ms-total').textContent=d.totalLeadsAllTime;
+  document.getElementById('ms-pending').textContent=d.pendingReports;
+  document.getElementById('ms-fulfilled').textContent=d.fulfilledReports;
+  updatePeriodCard(1,d.period1,d.leadsPerPeriod,d.currentPeriod);
+  updatePeriodCard(2,d.period2,d.leadsPerPeriod,d.currentPeriod);
+  if(d.fulfilledReports>0){
+    document.getElementById('dash-alert').innerHTML=`<div class="alert alert-ok"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>You have <strong>${d.fulfilledReports}</strong> fulfilled report(s) ready to download in <strong>My History</strong>.</span></div>`;
+  }
+}
+
+function updatePeriodCard(n,p,max,current){
+  const pct=max>0?Math.min(100,Math.round(p.extracted/max*100)):0;
+  document.getElementById('p'+n+'-val').textContent=p.extracted;
+  document.getElementById('p'+n+'-max').textContent='/ '+max+' leads';
+  document.getElementById('p'+n+'-sub').textContent=p.remaining===0?'All leads extracted!':(p.remaining)+' remaining';
+  document.getElementById('p'+n+'-bar').style.width=pct+'%';
+  const btn=document.getElementById('p'+n+'-btn');
+  const card=document.getElementById('pc'+n);
+  const isPeriod=current===n;
+  if(p.remaining===0){
+    btn.className='extract-btn eb-done';
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> All Leads Extracted`;
+    card.classList.add('pc-done');
+  }else if(!isPeriod){
+    btn.className='extract-btn eb-wait';
+    btn.textContent=n===1?'Available in morning period':'Available in afternoon period';
+  }else{
+    btn.className='extract-btn eb-can';
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> Extract ${p.remaining} Lead${p.remaining!==1?'s':''} Now`;
+    btn.setAttribute('data-period',n);
+  }
+}
+
+async function extractLeads(periodHint){
+  if(!dashData)return;
+  const btn=document.getElementById('p'+dashData.currentPeriod+'-btn');
+  if(!btn||!btn.classList.contains('eb-can')){showFlash('Leads not available in the current period','warn');return;}
+  btn.disabled=true;btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".6s" repeatCount="indefinite"/></circle></svg> Extracting…`;
+  const r=await api(API+'/leads/extract',{method:'POST'});
+  if(!r){btn.disabled=false;return;}
+  const d=await r.json();
+  if(r.ok){showFlash(d.message,'ok');loadDashboard();}
+  else{showFlash(d.error||'Could not extract leads','err');btn.disabled=false;loadDashboard();}
+}
+
+// ── My Leads ──────────────────────────────────────────────────────────────────
+async function loadMyLeads(){
+  const date=document.getElementById('leads-date').value;
+  const r=await api(API+'/leads'+(date?'?date='+date:''));if(!r)return;
+  const leads=await r.json();const tb=document.getElementById('leads-tbody');
+  if(!leads.length){
+    tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>${date?'No leads for this date':'No leads extracted yet'}</p><small>${date?'Try "Show All" to see all leads':'Go to Dashboard and click Extract Leads'}</small></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML=leads.map((l,i)=>{
+    const initials=(l.first_name||'').charAt(0).toUpperCase()+(l.last_name||'').charAt(0).toUpperCase();
+    return`<tr class="lead-row" onclick="viewLead(${l.id})">
+      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td>
+        <div class="name-badge">
+          <div class="nb-dot">${initials}</div>
+          <strong style="color:var(--accent)">${esc(l.first_name)} ${esc(l.middle_name||'')} ${esc(l.last_name)}</strong>
+        </div>
+      </td>
+      <td><span class="badge b-blue">Period ${l.extraction_period}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(l.extracted_at)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewLead(${l.id})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        View
+      </button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function viewLead(id){
+  const r=await api(API+'/leads/'+id);if(!r)return;
+  const l=await r.json();
+  const fullName=[l.first_name,l.middle_name,l.last_name].filter(Boolean).join(' ');
+  document.getElementById('lead-modal-body').innerHTML=`
+    <div class="lead-tag">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+      Lead #${l.id} &nbsp;·&nbsp; Period ${l.extraction_period}
+    </div>
+    <div class="lead-field">
+      <div class="lf-label">Full Name</div>
+      <div class="lf-val">${esc(fullName)||'—'}</div>
+    </div>
+    <div class="lead-field">
+      <div class="lf-label">Phone Number</div>
+      <div class="lf-val">${esc(l.phone)||'—'}</div>
+    </div>
+    <div class="lead-field">
+      <div class="lf-label">Home Address</div>
+      <div class="lf-val" style="font-size:14px">${esc(l.address)||'—'}</div>
+    </div>
+    <div class="lf-note">Extracted ${fmtDate(l.extracted_at)} &nbsp;·&nbsp; Copying is disabled</div>`;
+  document.getElementById('lead-modal').classList.remove('hidden');
+}
+function closeLeadModal(){document.getElementById('lead-modal').classList.add('hidden');}
+function leadModalBgClick(e){if(e.target.id==='lead-modal')closeLeadModal();}
+
+// ── Load leads for dropdowns ──────────────────────────────────────────────────
+async function loadLeadsForSelect(selectId){
+  const r=await api(API+'/leads');if(!r)return;
+  const leads=await r.json();const sel=document.getElementById(selectId);
+  sel.innerHTML='<option value="">— Not linked to a specific lead —</option>'+leads.map(l=>`<option value="${l.id}">${esc(l.first_name)} ${esc(l.middle_name||'')} ${esc(l.last_name)} — ${fmtDate(l.extracted_at)}</option>`).join('');
+}
+
+// ── Request Report ────────────────────────────────────────────────────────────
+async function submitReportRequest(){
+  const details=document.getElementById('req-details').value.trim();
+  const lead_id=document.getElementById('req-lead').value||null;
+  const a=document.getElementById('req-alert');
+  if(!details){a.innerHTML='<div class="alert alert-err">Please enter customer details</div>';return;}
+  a.innerHTML='';
+  const r=await api(API+'/report-requests',{method:'POST',body:{lead_id,customer_details:details}});
+  if(!r)return;const d=await r.json();
+  if(r.ok){
+    a.innerHTML='<div class="alert alert-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>Report request sent to admin. You will be notified when it is ready.</span></div>';
+    document.getElementById('req-details').value='';document.getElementById('req-lead').value='';document.getElementById('req-cc').textContent='0 characters';
+  }else{a.innerHTML=`<div class="alert alert-err">${esc(d.error)}</div>`;}
+}
+
+// ── Submit Lead ───────────────────────────────────────────────────────────────
+async function submitLead(){
+  const details=document.getElementById('sub-details').value.trim();
+  const lead_id=document.getElementById('sub-lead').value||null;
+  const a=document.getElementById('sub-alert');
+  if(!details){a.innerHTML='<div class="alert alert-err">Please enter submission details</div>';return;}
+  a.innerHTML='';
+  const r=await api(API+'/lead-submissions',{method:'POST',body:{lead_id,submission_details:details}});
+  if(!r)return;const d=await r.json();
+  if(r.ok){
+    a.innerHTML='<div class="alert alert-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>Lead submitted to admin successfully.</span></div>';
+    document.getElementById('sub-details').value='';document.getElementById('sub-lead').value='';document.getElementById('sub-cc').textContent='0 characters';
+  }else{a.innerHTML=`<div class="alert alert-err">${esc(d.error)}</div>`;}
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+function switchHistTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  document.getElementById('hist-reports').classList.toggle('hidden',tab!=='reports');
+  document.getElementById('hist-submissions').classList.toggle('hidden',tab!=='submissions');
+  if(tab==='reports')loadHistReports();else loadHistSubs();
+}
+
+async function loadHistReports(){
+  const r=await api(API+'/report-requests');if(!r)return;
+  const items=await r.json();const tb=document.getElementById('hist-rpts-tbody');
+  if(!items.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><p>No report requests yet</p></div></td></tr>';return;}
+  tb.innerHTML=items.map(rpt=>`
+    <tr>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(rpt.created_at)}</td>
+      <td>${rpt.first_name?esc(rpt.first_name)+' '+esc(rpt.last_name):'—'}</td>
+      <td style="max-width:180px;color:var(--muted);font-size:12px">${trunc(rpt.customer_details)}</td>
+      <td><span class="badge ${rpt.status==='fulfilled'?'b-ok':'b-warn'}">${rpt.status}</span></td>
+      <td>${rpt.status==='fulfilled'?`<button class="btn btn-success btn-sm" onclick="downloadReport(${rpt.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/></svg> Download</button>`:'<span style="color:var(--muted);font-size:12px">Awaiting admin</span>'}</td>
+    </tr>`).join('');
+}
+
+async function loadHistSubs(){
+  const r=await api(API+'/lead-submissions');if(!r)return;
+  const items=await r.json();const tb=document.getElementById('hist-subs-tbody');
+  if(!items.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><p>No submissions yet</p></div></td></tr>';return;}
+  tb.innerHTML=items.map(s=>`
+    <tr>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(s.created_at)}</td>
+      <td>${s.first_name?esc(s.first_name)+' '+esc(s.last_name):'—'}</td>
+      <td><span class="badge ${s.status==='processed'?'b-ok':'b-warn'}">${s.status}</span></td>
+      <td style="color:var(--muted);font-size:12px">${s.admin_note?esc(s.admin_note):'—'}</td>
+    </tr>`).join('');
+}
+
+function downloadReport(id){
+  const a=document.createElement('a');
+  fetch(API+'/report-requests/'+id+'/download',{headers:{Authorization:'Bearer '+token}})
+    .then(r=>r.blob()).then(blob=>{
+      const url=URL.createObjectURL(blob);
+      a.href=url;document.body.appendChild(a);a.click();
+      URL.revokeObjectURL(url);document.body.removeChild(a);
+    });
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function updateCharCount(textareaId,counterId){
+  const len=document.getElementById(textareaId).value.length;
+  document.getElementById(counterId).textContent=len+' character'+(len!==1?'s':'');
+}
+
+function showFlash(msg,type='ok'){
+  const old=document.getElementById('flash-msg');if(old)old.remove();
+  const el=document.createElement('div');el.id='flash-msg';
+  const icons={ok:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`,err:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,warn:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>`};
+  el.className=`toast toast-${type}`;el.innerHTML=(icons[type]||'')+`<span>${msg}</span>`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3800);
+}
+
+// ── COPY PROTECTION ───────────────────────────────────────────────────────────
+document.addEventListener('contextmenu',e=>{if(e.target.closest('.lead-protected'))e.preventDefault();});
+document.addEventListener('copy',e=>{
+  const sel=window.getSelection();
+  if(sel&&sel.anchorNode){
+    const node=sel.anchorNode.nodeType===3?sel.anchorNode.parentNode:sel.anchorNode;
+    if(node&&node.closest&&node.closest('.lead-protected')){e.preventDefault();if(e.clipboardData)e.clipboardData.setData('text/plain','');}
+  }
+});
+document.addEventListener('keydown',e=>{
+  const modalOpen=!document.getElementById('lead-modal').classList.contains('hidden');
+  if(modalOpen&&(e.ctrlKey||e.metaKey)&&['a','c','x','s','p'].includes(e.key.toLowerCase()))e.preventDefault();
+});
+document.addEventListener('selectstart',e=>{if(e.target.closest('.lead-protected'))e.preventDefault();});
+document.addEventListener('dragstart',e=>{if(e.target.closest('.lead-protected'))e.preventDefault();});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+(function init(){
+  if(!token){window.location.href='/';return;}
+  const user=getUser();if(!user){window.location.href='/';return;}
+  const name=user.full_name||user.username;
+  document.getElementById('sb-name').textContent=name;
+  document.getElementById('sb-avatar').textContent=name.charAt(0).toUpperCase();
+  document.getElementById('leads-date').value=new Date().toISOString().split('T')[0];
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

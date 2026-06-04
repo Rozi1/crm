@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Platform — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;height:100vh;overflow:hidden;background:#fff;
+}
+
+/* ── Brand Panel (Left 45%) ─────────────────────────── */
+.brand{
+  flex:0 0 45%;display:flex;flex-direction:column;padding:44px 48px;
+  background:linear-gradient(160deg,#1e1b4b 0%,#312e81 28%,#4338ca 62%,#6366f1 100%);
+  position:relative;overflow:hidden;
+}
+.brand-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.07);pointer-events:none}
+.b-logo{display:flex;align-items:center;gap:14px;position:relative;z-index:2;animation:fromLeft .55s .0s ease both}
+.b-logo-mark{
+  width:50px;height:50px;border-radius:15px;flex-shrink:0;
+  background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;
+}
+.b-logo-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.1}
+.b-logo-tag{font-size:11.5px;color:rgba(255,255,255,.55);margin-top:2px;font-weight:400}
+
+.b-hero{position:relative;z-index:2;margin-top:auto;animation:fromLeft .55s .08s ease both}
+.b-hero h1{font-size:40px;font-weight:900;color:#fff;line-height:1.08;letter-spacing:-1.5px;margin-bottom:16px}
+.b-hero h1 em{font-style:normal;color:#a5b4fc}
+.b-hero p{font-size:15px;color:rgba(255,255,255,.62);line-height:1.65;max-width:330px}
+
+.b-features{position:relative;z-index:2;margin-top:34px;display:flex;flex-direction:column;gap:13px;animation:fromLeft .55s .16s ease both}
+.b-feat{display:flex;align-items:center;gap:12px}
+.b-feat-ico{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;
+}
+.b-feat-txt{font-size:13.5px;color:rgba(255,255,255,.78);font-weight:500}
+
+.b-stats{
+  position:relative;z-index:2;margin-top:36px;
+  display:flex;gap:24px;animation:fromLeft .55s .24s ease both;
+  padding-top:28px;border-top:1px solid rgba(255,255,255,.1);
+}
+.b-stat-val{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.b-stat-lbl{font-size:11px;color:rgba(255,255,255,.5);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+.b-copy{position:relative;z-index:2;margin-top:28px;font-size:11.5px;color:rgba(255,255,255,.28);animation:fromLeft .55s .3s ease both}
+
+/* ── Form Panel (Right 55%) ─────────────────────────── */
+.form-panel{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:48px 72px;background:#fff;overflow-y:auto;position:relative;
+}
+.form-panel::before{
+  content:'';position:absolute;top:0;right:0;bottom:0;left:0;
+  background:radial-gradient(ellipse 80% 60% at 60% 10%,rgba(79,70,229,.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.form-wrap{width:100%;max-width:380px;position:relative;z-index:1;animation:fromRight .55s ease both}
+
+.f-top{margin-bottom:34px}
+.f-top-tag{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  border-radius:20px;background:#eef2ff;border:1px solid #c7d2fe;
+  font-size:11.5px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:18px;
+}
+.f-top h2{font-size:30px;font-weight:900;color:#0f172a;letter-spacing:-.7px;margin-bottom:8px}
+.f-top p{font-size:13.5px;color:#64748b;line-height:1.6}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.7px}
+.iw{position:relative}
+.iw svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;transition:color .2s;z-index:1}
+.iw input{
+  width:100%;padding:12.5px 14px 12.5px 40px;
+  background:#f8fafc;border:1.5px solid #e8edf5;border-radius:12px;
+  color:#0f172a;font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.iw input:focus{border-color:#4f46e5;background:#fff;box-shadow:0 0 0 3.5px rgba(79,70,229,.1)}
+.iw:focus-within svg{color:#4f46e5}
+.iw input::placeholder{color:#c8d2e0}
+
+.err-box{
+  background:linear-gradient(135deg,#fef2f2,#fff5f5);
+  border:1px solid #fecaca;border-radius:10px;
+  padding:11px 14px;font-size:13px;color:#dc2626;
+  margin-bottom:18px;display:none;line-height:1.5;
+  animation:shake .32s ease;display:flex;align-items:flex-start;gap:9px;
+}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+.btn-signin{
+  width:100%;padding:13.5px;margin-top:6px;
+  background:linear-gradient(135deg,#312e81,#4338ca 50%,#6366f1);
+  color:#fff;border:none;border-radius:12px;
+  font-size:14.5px;font-weight:700;font-family:inherit;
+  cursor:pointer;letter-spacing:.1px;
+  transition:opacity .18s,transform .15s,box-shadow .18s;
+  box-shadow:0 4px 18px rgba(67,56,202,.42);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.btn-signin:hover{opacity:.91;box-shadow:0 8px 32px rgba(67,56,202,.52);transform:translateY(-1.5px)}
+.btn-signin:active{transform:scale(.99)}
+.btn-signin:disabled{background:#e2e8f0;color:#94a3b8;box-shadow:none;cursor:not-allowed;transform:none;opacity:1}
+
+.f-divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:#cbd5e1;font-size:11px}
+.f-divider::before,.f-divider::after{content:'';flex:1;height:1px;background:#e8edf5}
+
+.ip-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;font-size:12px;color:#94a3b8}
+.ip-row strong{color:#64748b;font-weight:600}
+
+/* Animations */
+@keyframes fromLeft{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+@keyframes fromRight{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Responsive */
+@media(max-width:800px){
+  .brand{display:none}
+  .form-panel{padding:40px 28px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ BRAND PANEL ═══════════════ -->
+<div class="brand">
+  <!-- decorative rings -->
+  <div class="brand-ring" style="width:560px;height:560px;top:-220px;right:-220px"></div>
+  <div class="brand-ring" style="width:320px;height:320px;top:38%;left:-130px"></div>
+  <div class="brand-ring" style="width:180px;height:180px;bottom:60px;right:40px"></div>
+
+  <div class="b-logo">
+    <div class="b-logo-mark">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <path d="M4 7h18M4 12.5h12M4 18h14" stroke="white" stroke-width="2.3" stroke-linecap="round"/>
+        <circle cx="20" cy="18" r="5" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.7)" stroke-width="1.4"/>
+        <path d="M17.8 18l1.5 1.5 2.8-2.8" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="b-logo-name">CRM Platform</div>
+      <div class="b-logo-tag">Agent Management System</div>
+    </div>
+  </div>
+
+  <div class="b-hero">
+    <h1>Empower Your<br><em>Sales Team</em></h1>
+    <p>A secure, intelligent platform to manage agents, distribute leads, and track performance in real time.</p>
+  </div>
+
+  <div class="b-features">
+    <div class="b-feat">
+      <div class="b-feat-ico">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.88)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <span class="b-feat-txt">Complete agent lifecycle management</span>
+    </div>
+    <div class="b-feat">
+      <div class="b-feat-ico">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.88)" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </div>
+      <span class="b-feat-txt">Intelligent lead distribution &amp; tracking</span>
+    </div>
+    <div class="b-feat">
+      <div class="b-feat-ico">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.88)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <span class="b-feat-txt">IP-based access control &amp; kill switch</span>
+    </div>
+    <div class="b-feat">
+      <div class="b-feat-ico">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.88)" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+      </div>
+      <span class="b-feat-txt">Real-time performance analytics</span>
+    </div>
+  </div>
+
+  <div class="b-stats">
+    <div><div class="b-stat-val">2×</div><div class="b-stat-lbl">Period Slots</div></div>
+    <div><div class="b-stat-val">48h</div><div class="b-stat-lbl">Admin Session</div></div>
+    <div><div class="b-stat-val">100%</div><div class="b-stat-lbl">Secure</div></div>
+  </div>
+
+  <div class="b-copy">© 2026 CRM Platform · All rights reserved</div>
+</div>
+
+<!-- ═══════════════ FORM PANEL ═══════════════ -->
+<div class="form-panel">
+  <div class="form-wrap">
+    <div class="f-top">
+      <div class="f-top-tag">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secure Sign In
+      </div>
+      <h2>Welcome back</h2>
+      <p>Sign in to continue managing your team, leads and performance.</p>
+    </div>
+
+    <div class="err-box" id="err" style="display:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="err-msg"></span>
+    </div>
+
+    <form id="form">
+      <div class="field">
+        <label>Username</label>
+        <div class="iw">
+          <input type="text" id="usr" autocomplete="username" placeholder="Enter your username" required>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="iw">
+          <input type="password" id="pwd" autocomplete="current-password" placeholder="Enter your password" required>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+      </div>
+      <button class="btn-signin" id="btn" type="submit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+    </form>
+
+    <div class="ip-row" id="ipInfo">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+      Checking connection…
+    </div>
+  </div>
+</div>
+
+<script>
+(async()=>{
+  try{
+    const d=await fetch('/api/auth/my-ip').then(r=>r.json());
+    document.getElementById('ipInfo').innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Your IP: <strong>${d.ip}</strong>`;
+  }catch{document.getElementById('ipInfo').textContent='';}
+})();
+
+const _t=localStorage.getItem('crm_token'),_u=localStorage.getItem('crm_user');
+if(_t&&_u){try{const u=JSON.parse(_u);window.location.href=u.role==='admin'?'/admin':'/agent';}catch{}}
+
+const SIGN_IN_HTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In`;
+const LOADING_HTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><circle cx="12" cy="12" r="9" stroke-dasharray="28" stroke-dashoffset="10"/></svg> Signing in…`;
+
+function showErr(msg){
+  const b=document.getElementById('err'),m=document.getElementById('err-msg');
+  m.textContent=msg;b.style.display='flex';
+}
+function hideErr(){document.getElementById('err').style.display='none';}
+
+document.getElementById('form').addEventListener('submit',async e=>{
+  e.preventDefault();hideErr();
+  const btn=document.getElementById('btn');
+  btn.disabled=true;btn.innerHTML=LOADING_HTML;
+  try{
+    const r=await fetch('/api/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:document.getElementById('usr').value,password:document.getElementById('pwd').value})
+    });
+    const d=await r.json();
+    if(r.ok){
+      localStorage.setItem('crm_token',d.token);
+      localStorage.setItem('crm_user',JSON.stringify(d.user));
+      window.location.href=d.user.role==='admin'?'/admin':'/agent';
+    }else{showErr(d.error||'Invalid credentials. Please check and try again.');}
+  }catch{showErr('Connection error. Please ensure the server is running.');}
+  btn.disabled=false;btn.innerHTML=SIGN_IN_HTML;
+});
+</script>
+</body>
+</html>
