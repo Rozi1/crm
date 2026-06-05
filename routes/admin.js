@@ -215,6 +215,17 @@ router.delete('/leads/:id', (req, res) => {
   res.json({ message: 'Lead deleted' });
 });
 
+router.post('/leads/bulk-delete', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'No IDs provided' });
+  const db = getDB();
+  const validIds = ids.map(Number).filter(n => Number.isInteger(n) && n > 0);
+  if (!validIds.length) return res.status(400).json({ error: 'Invalid IDs' });
+  const placeholders = validIds.map(() => '?').join(',');
+  const count = db.prepare(`DELETE FROM leads WHERE id IN (${placeholders})`).run(...validIds).changes;
+  res.json({ message: `${count} lead(s) deleted`, count });
+});
+
 // ─── Reports ─────────────────────────────────────────────────────────────────
 
 router.get('/reports', (req, res) => {

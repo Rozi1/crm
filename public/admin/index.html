@@ -143,6 +143,19 @@ main section{animation:sec-fade .22s ease both}
 .btn-kill-off:hover{background:#dcfce7}
 .btn-kill-on{background:var(--err-bg);color:var(--err-text);border:1.5px solid var(--err-border);font-size:13px;font-weight:600;padding:9px 18px;border-radius:9px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
 .btn-kill-on:hover{background:#fee2e2}
+/* ── Checkbox & Bulk Select ───────────────────────────────────── */
+.cb-wrap{display:flex;align-items:center;justify-content:center}
+.row-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);border-radius:4px}
+tr.row-selected td{background:#eef2ff!important}
+.bulk-bar{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:500;background:#1e1b4b;color:#fff;border-radius:14px;padding:12px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(15,23,42,.28),0 2px 8px rgba(15,23,42,.2);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap}
+.bulk-bar.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.bulk-bar-count{font-size:13px;font-weight:700;background:rgba(255,255,255,.15);border-radius:8px;padding:4px 10px}
+.bulk-bar-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
+.bulk-bar-btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s}
+.bulk-bar-del{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff}
+.bulk-bar-del:hover{opacity:.9;transform:translateY(-1px)}
+.bulk-bar-clear{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.15)}
+.bulk-bar-clear:hover{background:rgba(255,255,255,.2)}
 
 /* ══ TABLE ══════════════════════════════════════════ */
 .tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm)}
@@ -500,11 +513,25 @@ input[type=file].form-control{padding:8px}
     </div>
     <div id="leads-count" style="color:var(--muted);font-size:12.5px;margin-bottom:10px"></div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Batch</th><th>Status</th><th>Assigned To</th><th>Date</th><th>Actions</th></tr></thead>
+      <thead><tr><th style="width:40px"><div class="cb-wrap"><input type="checkbox" class="row-cb" id="cb-all" onchange="toggleSelectAll(this)" title="Select all"></div></th><th>Name</th><th>Phone</th><th>Address</th><th>Batch</th><th>Status</th><th>Assigned To</th><th>Date</th><th>Actions</th></tr></thead>
       <tbody id="leads-tbody"></tbody>
     </table></div>
     <div class="pgn" id="leads-pagination"></div>
   </section>
+
+  <!-- BULK ACTION BAR -->
+  <div class="bulk-bar" id="bulk-bar">
+    <span class="bulk-bar-count"><span id="bulk-count">0</span> selected</span>
+    <div class="bulk-bar-sep"></div>
+    <button class="bulk-bar-btn bulk-bar-del" onclick="bulkDeleteLeads()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      Delete Selected
+    </button>
+    <button class="bulk-bar-btn bulk-bar-clear" onclick="clearSelection()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Clear
+    </button>
+  </div>
 
   <!-- REPORTS -->
   <section id="sec-reports" class="hidden">
@@ -828,7 +855,10 @@ function updateKSUI(isOn){
 async function toggleKillSwitch(){
   const r=await api(API+'/settings');if(!r)return;
   const s=await r.json();const cur=s.kill_switch==='true';const nv=!cur;
-  if(!confirm(nv?'DISABLE the system? All agents will be locked out immediately.':'ENABLE the system? Agents will regain access immediately.'))return;
+  const ok=await showConfirm(nv
+    ?{title:'Disable System',message:'Disable the system now?',details:'All agents will be locked out immediately and cannot log in until the system is re-enabled.',icon:'power',confirmLabel:'Yes, Disable',confirmCls:'btn-danger'}
+    :{title:'Enable System',message:'Enable the system now?',details:'Agents will regain full access immediately.',icon:'info',confirmLabel:'Yes, Enable',confirmCls:'btn-success'});
+  if(!ok)return;
   await api(API+'/settings',{method:'PUT',body:{kill_switch:String(nv)}});
   updateKSUI(nv);showFlash(nv?'System disabled — agents locked out.':'System enabled — agents can now access.',nv?'err':'ok');
 }
@@ -888,7 +918,10 @@ async function editAgent(id){
   else{const d=await r.json();showFlash(d.error,'err');}
 }
 async function toggleAgent(id,active){
-  if(active&&!confirm('Deactivate this agent?'))return;
+  if(active){
+    const ok=await showConfirm({title:'Deactivate Agent',message:'Deactivate this agent?',details:'They will not be able to log in until reactivated.',icon:'warn',confirmLabel:'Deactivate',confirmCls:'btn-warn'});
+    if(!ok)return;
+  }
   const r=await api(API+'/users/'+id,{method:'PUT',body:{is_active:active?0:1}});
   if(r.ok){loadAgents();showFlash(active?'Agent deactivated':'Agent activated',active?'warn':'ok');}
 }
@@ -954,10 +987,14 @@ async function showAgentLeads(id,name){
 
 // ── Permanent Delete User ─────────────────────────────────────────────────────
 async function permanentDeleteUser(id,username){
-  if(!confirm('PERMANENTLY delete agent "'+username+'"?\n\nThis will also delete ALL their submissions, reports and lead extractions. This CANNOT be undone.'))return;
-  if(!confirm('Are you absolutely sure? Type YES to confirm in the next dialog.'))return;
-  const ans=prompt('Type YES to permanently delete "'+username+'":');
-  if(ans!=='YES'){showFlash('Deletion cancelled','warn');return;}
+  const ok=await showPromptConfirm({
+    title:'Permanently Delete Agent',
+    message:`You are about to permanently delete <strong>${esc(username)}</strong>. This will also remove <strong>all</strong> their submissions, reports and lead extractions. <span style="color:var(--err);font-weight:600">This cannot be undone.</span>`,
+    keyword:'DELETE',
+    confirmLabel:'Permanently Delete',
+    confirmCls:'btn-danger'
+  });
+  if(!ok)return;
   const r=await api(API+'/users/'+id+'/permanent',{method:'DELETE'});
   const d=await r.json();
   if(r.ok){loadAgents();showFlash('Agent "'+username+'" permanently deleted','ok');}
@@ -973,14 +1010,16 @@ async function loadBatches(){
   sel.value=cur;
 }
 async function loadLeads(){
+  clearSelection();
   const batch=document.getElementById('batch-filter')?.value||'';
   const r=await api(`${API}/leads?page=${leadsPage}&limit=100${batch?'&batch='+encodeURIComponent(batch):''}`);
   if(!r)return;const d=await r.json();
   document.getElementById('leads-count').textContent=`Showing ${d.leads.length} of ${d.total} leads`;
   const tb=document.getElementById('leads-tbody');
-  if(!d.leads.length){tb.innerHTML=emptyRow(8,'No leads in this selection');renderPagination(0,100);return;}
+  if(!d.leads.length){tb.innerHTML=emptyRow(9,'No leads in this selection');renderPagination(0,100);return;}
   tb.innerHTML=d.leads.map(l=>`
-    <tr>
+    <tr id="lrow-${l.id}">
+      <td><div class="cb-wrap"><input type="checkbox" class="row-cb lead-cb" data-id="${l.id}" onchange="onLeadCbChange()"></div></td>
       <td><strong style="color:var(--text)">${esc(l.first_name)} ${esc(l.middle_name||'')} ${esc(l.last_name)}</strong></td>
       <td style="font-family:monospace;font-size:12.5px;color:var(--muted)">${esc(l.phone)||'—'}</td>
       <td style="color:var(--muted);font-size:12px;max-width:200px">${trunc(l.address,38)||'—'}</td>
@@ -1014,9 +1053,54 @@ async function uploadLeads(){
   else showFlash(d.error,'err');
 }
 async function deleteLead(id){
-  if(!confirm('Delete this lead permanently?'))return;
+  const ok=await showConfirm({title:'Delete Lead',message:'Delete this lead permanently?',details:'This action cannot be undone.',icon:'danger',confirmLabel:'Delete',confirmCls:'btn-danger'});
+  if(!ok)return;
   const r=await api(API+'/leads/'+id,{method:'DELETE'});
   if(r.ok){loadLeads();loadBatches();showFlash('Lead deleted','ok');}
+}
+
+// ── Multi-select / Bulk Delete ────────────────────────────────────────────────
+function getSelectedLeadIds(){
+  return [...document.querySelectorAll('.lead-cb:checked')].map(cb=>parseInt(cb.dataset.id));
+}
+function onLeadCbChange(){
+  const ids=getSelectedLeadIds();
+  const bar=document.getElementById('bulk-bar');
+  document.getElementById('bulk-count').textContent=ids.length;
+  bar.classList.toggle('visible',ids.length>0);
+  // update row highlight
+  document.querySelectorAll('.lead-cb').forEach(cb=>{
+    document.getElementById('lrow-'+cb.dataset.id)?.classList.toggle('row-selected',cb.checked);
+  });
+  // sync select-all state
+  const all=document.querySelectorAll('.lead-cb');
+  const cbAll=document.getElementById('cb-all');
+  if(cbAll){cbAll.indeterminate=ids.length>0&&ids.length<all.length;cbAll.checked=ids.length===all.length&&all.length>0;}
+}
+function toggleSelectAll(cb){
+  document.querySelectorAll('.lead-cb').forEach(c=>{c.checked=cb.checked;});
+  onLeadCbChange();
+}
+function clearSelection(){
+  document.querySelectorAll('.lead-cb').forEach(c=>c.checked=false);
+  const cbAll=document.getElementById('cb-all');if(cbAll){cbAll.checked=false;cbAll.indeterminate=false;}
+  document.querySelectorAll('.row-selected').forEach(r=>r.classList.remove('row-selected'));
+  document.getElementById('bulk-bar')?.classList.remove('visible');
+}
+async function bulkDeleteLeads(){
+  const ids=getSelectedLeadIds();
+  if(!ids.length)return;
+  const ok=await showConfirm({
+    title:'Delete Selected Leads',
+    message:`Delete <strong>${ids.length}</strong> selected lead${ids.length!==1?'s':''} permanently?`,
+    details:'This action cannot be undone. Extracted leads will also be removed.',
+    icon:'danger',confirmLabel:`Delete ${ids.length} Lead${ids.length!==1?'s':''}`,confirmCls:'btn-danger'
+  });
+  if(!ok)return;
+  const r=await api(API+'/leads/bulk-delete',{method:'POST',body:{ids}});
+  const d=await r.json();
+  if(r&&r.ok){clearSelection();loadLeads();loadBatches();showFlash(d.message,'ok');}
+  else showFlash(d?.error||'Bulk delete failed','err');
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────────
@@ -1139,7 +1223,8 @@ async function addIP(){
   else showFlash(d.error,'err');
 }
 async function deleteIP(id,ip){
-  if(!confirm(`Remove ${ip} from the whitelist?`))return;
+  const ok=await showConfirm({title:'Remove IP',message:`Remove <strong>${esc(ip)}</strong> from the whitelist?`,details:'Agents connecting from this IP will immediately lose access.',icon:'warn',confirmLabel:'Remove',confirmCls:'btn-danger'});
+  if(!ok)return;
   const r=await api(API+'/ips/'+id,{method:'DELETE'});
   if(r.ok){loadIPs();showFlash('IP removed','warn');}
 }
@@ -1170,7 +1255,9 @@ async function doForceExtract(){
   const count=parseInt(document.getElementById('fe-count').value)||0;
   if(!agentId){showFlash('Please select an agent','err');return;}
   if(count<1||count>200){showFlash('Count must be between 1 and 200','err');return;}
-  if(!confirm(`Force-extract ${count} leads to agent for Period ${period}?`))return;
+  const agentName=document.getElementById('fe-agent').selectedOptions[0]?.text||'selected agent';
+  const ok=await showConfirm({title:'Force Extract Leads',message:`Assign <strong>${count}</strong> lead${count!==1?'s':''} to <strong>${esc(agentName)}</strong> for Period ${period}?`,details:'Leads will be immediately visible in the agent\'s dashboard.',icon:'info',confirmLabel:'Force Extract',confirmCls:'btn-primary'});
+  if(!ok)return;
   const r=await api(API+'/leads/force-extract',{method:'POST',body:{user_id:parseInt(agentId),period:parseInt(period),count}});
   const d=await r.json();
   if(r.ok)showFlash(`Force-extracted ${d.count} leads successfully`,'ok');
@@ -1193,6 +1280,36 @@ async function loadStats(){
       <td><strong style="color:var(--warn)">${s.reports_requested}</strong></td>
       <td><strong style="color:var(--ok)">${s.leads_submitted}</strong></td>
     </tr>`).join('');
+}
+
+// ── Confirm / Prompt Dialogs ────────────────────────────────────────────────
+function showConfirm({title='Confirm',message,details='',icon='warn',confirmLabel='Confirm',confirmCls='btn-primary'}){
+  return new Promise(resolve=>{
+    const ICONS={
+      warn:`<div style="width:52px;height:52px;border-radius:14px;background:#fefce8;border:1.5px solid #fde047;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>`,
+      danger:`<div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;border:1.5px solid #fecaca;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>`,
+      power:`<div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;border:1.5px solid #fecaca;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>`,
+      info:`<div style="width:52px;height:52px;border-radius:14px;background:#f0f9ff;border:1.5px solid #bae6fd;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0369a1" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg></div>`
+    };
+    const body=`<div style="display:flex;align-items:flex-start;gap:16px;padding:4px 0">${ICONS[icon]||ICONS.warn}<div style="flex:1;min-width:0"><div style="font-size:14.5px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:${details?'8':'0'}px">${message}</div>${details?`<div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:4px">${details}</div>`:''}</div></div>`;
+    openModal(title,body,[
+      {label:'Cancel',cls:'btn-ghost',action:()=>{closeModal();resolve(false);}},
+      {label:confirmLabel,cls:confirmCls,action:()=>{closeModal();resolve(true);}}
+    ]);
+  });
+}
+function showPromptConfirm({title='Confirm Action',message,keyword='DELETE',confirmLabel='Delete',confirmCls='btn-danger'}){
+  return new Promise(resolve=>{
+    const body=`<div style="display:flex;align-items:flex-start;gap:16px;padding:4px 0 16px"><div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;border:1.5px solid #fecaca;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:14.5px;font-weight:600;color:var(--text);line-height:1.5">${message}</div></div></div><div class="form-group" style="margin-bottom:0"><label>Type <strong style="font-family:monospace;background:#f1f5f9;padding:1px 6px;border-radius:4px;color:var(--err)">${keyword}</strong> to confirm</label><input type="text" class="form-control" id="pc-input" placeholder="Type ${keyword} here" autocomplete="off"></div>`;
+    openModal(title,body,[
+      {label:'Cancel',cls:'btn-ghost',action:()=>{closeModal();resolve(false);}},
+      {label:confirmLabel,cls:confirmCls,action:()=>{
+        const val=(document.getElementById('pc-input')?.value||'').trim();
+        if(val!==keyword){showFlash('Please type '+keyword+' to confirm','err');return;}
+        closeModal();resolve(true);
+      }}
+    ]);
+  });
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
@@ -1243,7 +1360,7 @@ async function showManageLead(leadId){
       </select></div>
     </div>`,
     [{label:'Cancel',cls:'btn-ghost',action:closeModal},
-     {label:'Delete Lead',cls:'btn-danger',action:()=>{if(confirm('Permanently delete this lead?')){closeModal();deleteLead(l.id);}}},
+     {label:'Delete Lead',cls:'btn-danger',action:()=>{closeModal();deleteLead(l.id);}},  
      {label:'Save Assignment',cls:'btn-primary',action:()=>saveLeadAssignment(l.id)}]);
   } catch(err){
     closeModal();
