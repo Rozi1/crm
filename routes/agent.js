@@ -68,7 +68,7 @@ router.get('/leads', (req, res) => {
   const db = getDB();
   const { date } = req.query;
   let q = `
-    SELECT l.id, l.first_name, l.middle_name, l.last_name, le.extraction_date, le.extraction_period, le.extracted_at
+    SELECT l.id, l.first_name, l.middle_name, l.last_name, l.phone, l.address, le.extraction_date, le.extraction_period, le.extracted_at
     FROM leads l JOIN lead_extractions le ON l.id=le.lead_id WHERE le.user_id=?`;
   const params = [req.user.id];
   if (date) { q += ' AND le.extraction_date=?'; params.push(date); }

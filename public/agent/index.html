@@ -182,6 +182,38 @@ select.form-control{cursor:pointer}
 /* ── Name Badge ────────────────────────────── */
 .name-badge{display:inline-flex;align-items:center;gap:8px}
 .nb-dot{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#4338ca,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
+
+/* ── Lead Detail Page ──────────────────────── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;color:var(--muted);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit;margin-bottom:18px;transition:all .15s;box-shadow:var(--sh-sm)}
+.back-btn:hover{color:var(--accent);border-color:var(--accent-muted);background:var(--accent-light)}
+.ld-hero{background:linear-gradient(135deg,#312e81 0%,#4338ca 50%,#6366f1 100%);border-radius:var(--radius);padding:26px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(67,56,202,.28)}
+.ld-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.ld-hero::after{content:'';position:absolute;bottom:-60px;right:80px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none}
+.ld-hero-inner{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
+.ld-avatar{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800;flex-shrink:0;backdrop-filter:blur(6px)}
+.ld-name{font-size:24px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.ld-meta{display:flex;gap:10px;flex-wrap:wrap}
+.ld-meta-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);font-size:11px;font-weight:600;backdrop-filter:blur(6px)}
+.ld-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.ld-info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s}
+.ld-info-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.ld-info-card.full{grid-column:1/-1}
+.ld-ic-head{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700;margin-bottom:10px}
+.ld-ic-head svg{color:var(--accent);opacity:.8}
+.ld-ic-val{font-size:15px;font-weight:600;color:var(--text);line-height:1.4;word-break:break-word}
+.ld-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+@media (max-width:900px){.ld-info-grid,.ld-action-grid{grid-template-columns:1fr}}
+.ld-action-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
+.ld-action-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.ld-action-card.rpt::before{background:linear-gradient(90deg,#0369a1,#0ea5e9)}
+.ld-action-card.sub::before{background:linear-gradient(90deg,#15803d,#22c55e)}
+.ld-ah{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.ld-ah-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ld-action-card.rpt .ld-ah-ico{background:var(--info-bg);color:var(--info);border:1px solid var(--info-border)}
+.ld-action-card.sub .ld-ah-ico{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+.ld-ah-title{font-size:14px;font-weight:700;color:var(--text)}
+.ld-ah-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.ld-protected-note{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10.5px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted);font-weight:600;margin-left:8px}
 </style>
 </head>
 <body>
@@ -293,9 +325,18 @@ select.form-control{cursor:pointer}
       </button>
     </div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>Lead Name</th><th>Period</th><th>Extracted</th><th>Action</th></tr></thead>
-      <tbody id="leads-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Loading…</p></div></td></tr></tbody>
+      <thead><tr><th>#</th><th>Lead Name</th><th>Phone</th><th>Address</th><th>Period</th><th>Action</th></tr></thead>
+      <tbody id="leads-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Loading…</p></div></td></tr></tbody>
     </table></div>
+  </section>
+
+  <!-- LEAD DETAIL PAGE -->
+  <section id="sec-lead-detail" class="hidden">
+    <button class="back-btn" onclick="closeLeadDetail()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to My Leads
+    </button>
+    <div id="ld-content"></div>
   </section>
 
   <!-- REQUEST REPORT -->
@@ -481,7 +522,7 @@ async function loadMyLeads(){
   const r=await api(API+'/leads'+(date?'?date='+date:''));if(!r)return;
   const leads=await r.json();const tb=document.getElementById('leads-tbody');
   if(!leads.length){
-    tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>${date?'No leads for this date':'No leads extracted yet'}</p><small>${date?'Try "Show All" to see all leads':'Go to Dashboard and click Extract Leads'}</small></div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>${date?'No leads for this date':'No leads extracted yet'}</p><small>${date?'Try "Show All" to see all leads':'Go to Dashboard and click Extract Leads'}</small></div></td></tr>`;
     return;
   }
   tb.innerHTML=leads.map((l,i)=>{
@@ -494,8 +535,9 @@ async function loadMyLeads(){
           <strong style="color:var(--accent)">${esc(l.first_name)} ${esc(l.middle_name||'')} ${esc(l.last_name)}</strong>
         </div>
       </td>
+      <td style="font-family:monospace;font-size:12.5px;color:var(--text2)">${esc(l.phone)||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:260px">${esc(l.address)||'—'}</td>
       <td><span class="badge b-blue">Period ${l.extraction_period}</span></td>
-      <td style="color:var(--muted);font-size:12px">${fmtDate(l.extracted_at)}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewLead(${l.id})">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         View
@@ -508,25 +550,123 @@ async function viewLead(id){
   const r=await api(API+'/leads/'+id);if(!r)return;
   const l=await r.json();
   const fullName=[l.first_name,l.middle_name,l.last_name].filter(Boolean).join(' ');
-  document.getElementById('lead-modal-body').innerHTML=`
-    <div class="lead-tag">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-      Lead #${l.id} &nbsp;·&nbsp; Period ${l.extraction_period}
+  const initials=(l.first_name||'').charAt(0).toUpperCase()+(l.last_name||'').charAt(0).toUpperCase();
+  document.getElementById('ld-content').innerHTML=`
+    <div class="ld-hero lead-protected">
+      <div class="ld-hero-inner">
+        <div class="ld-avatar">${initials||'?'}</div>
+        <div style="flex:1;min-width:0">
+          <div class="ld-name">${esc(fullName)||'Unknown Lead'}</div>
+          <div class="ld-meta">
+            <span class="ld-meta-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Period ${l.extraction_period}</span>
+            <span class="ld-meta-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Extracted ${fmtDate(l.extracted_at)}</span>
+            <span class="ld-meta-pill">Lead #${l.id}</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="lead-field">
-      <div class="lf-label">Full Name</div>
-      <div class="lf-val">${esc(fullName)||'—'}</div>
+
+    <div class="ld-info-grid lead-protected">
+      <div class="ld-info-card">
+        <div class="ld-ic-head">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Full Name
+        </div>
+        <div class="ld-ic-val">${esc(fullName)||'—'}</div>
+      </div>
+      <div class="ld-info-card">
+        <div class="ld-ic-head">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.73a16 16 0 0 0 6 6.56l1.27-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Phone Number
+        </div>
+        <div class="ld-ic-val" style="font-family:monospace">${esc(l.phone)||'—'}</div>
+      </div>
+      <div class="ld-info-card full">
+        <div class="ld-ic-head">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Home Address
+        </div>
+        <div class="ld-ic-val">${esc(l.address)||'—'}</div>
+      </div>
     </div>
-    <div class="lead-field">
-      <div class="lf-label">Phone Number</div>
-      <div class="lf-val">${esc(l.phone)||'—'}</div>
+
+    <div id="ld-action-alert"></div>
+
+    <div class="ld-action-grid">
+      <div class="ld-action-card rpt">
+        <div class="ld-ah">
+          <div class="ld-ah-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+          </div>
+          <div class="ld-ah-title">Request Report</div>
+        </div>
+        <div class="ld-ah-sub">Ask admin to pull a credit report for this lead.</div>
+        <div class="form-group">
+          <label>Customer Details</label>
+          <textarea class="form-control" id="ld-req-details" placeholder="Enter customer details: DOB, NI number, additional info…" oninput="updateCharCount('ld-req-details','ld-req-cc')" style="min-height:130px"></textarea>
+          <div class="char-count" id="ld-req-cc">0 characters</div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitLeadReportRequest(${l.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Request
+        </button>
+      </div>
+
+      <div class="ld-action-card sub">
+        <div class="ld-ah">
+          <div class="ld-ah-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+          <div class="ld-ah-title">Submit Lead</div>
+        </div>
+        <div class="ld-ah-sub">Send banking / card details for this lead to admin.</div>
+        <div class="form-group">
+          <label>Submission Details</label>
+          <textarea class="form-control" id="ld-sub-details" placeholder="Enter card information, bank details, account numbers…" oninput="updateCharCount('ld-sub-details','ld-sub-cc')" style="min-height:130px"></textarea>
+          <div class="char-count" id="ld-sub-cc">0 characters</div>
+        </div>
+        <button class="btn btn-success" style="width:100%;justify-content:center" onclick="submitLeadFromDetail(${l.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit to Admin
+        </button>
+      </div>
     </div>
-    <div class="lead-field">
-      <div class="lf-label">Home Address</div>
-      <div class="lf-val" style="font-size:14px">${esc(l.address)||'—'}</div>
-    </div>
-    <div class="lf-note">Extracted ${fmtDate(l.extracted_at)} &nbsp;·&nbsp; Copying is disabled</div>`;
-  document.getElementById('lead-modal').classList.remove('hidden');
+
+    <div class="lf-note" style="margin-top:18px">Copying lead data is disabled for security.</div>`;
+  document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-lead-detail').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function closeLeadDetail(){
+  document.getElementById('sec-lead-detail').classList.add('hidden');
+  document.getElementById('sec-leads').classList.remove('hidden');
+}
+
+async function submitLeadReportRequest(leadId){
+  const details=document.getElementById('ld-req-details').value.trim();
+  const a=document.getElementById('ld-action-alert');
+  if(!details){a.innerHTML='<div class="alert alert-err">Please enter customer details</div>';return;}
+  const r=await api(API+'/report-requests',{method:'POST',body:{lead_id:leadId,customer_details:details}});
+  if(!r)return;const d=await r.json();
+  if(r.ok){
+    a.innerHTML='<div class="alert alert-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>Report request sent. Admin will upload the report shortly.</span></div>';
+    document.getElementById('ld-req-details').value='';document.getElementById('ld-req-cc').textContent='0 characters';
+    showFlash('Report request sent','ok');
+  }else{a.innerHTML=`<div class="alert alert-err">${esc(d.error)}</div>`;}
+}
+
+async function submitLeadFromDetail(leadId){
+  const details=document.getElementById('ld-sub-details').value.trim();
+  const a=document.getElementById('ld-action-alert');
+  if(!details){a.innerHTML='<div class="alert alert-err">Please enter submission details</div>';return;}
+  const r=await api(API+'/lead-submissions',{method:'POST',body:{lead_id:leadId,submission_details:details}});
+  if(!r)return;const d=await r.json();
+  if(r.ok){
+    a.innerHTML='<div class="alert alert-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>Lead submitted to admin successfully.</span></div>';
+    document.getElementById('ld-sub-details').value='';document.getElementById('ld-sub-cc').textContent='0 characters';
+    showFlash('Lead submitted','ok');
+  }else{a.innerHTML=`<div class="alert alert-err">${esc(d.error)}</div>`;}
 }
 function closeLeadModal(){document.getElementById('lead-modal').classList.add('hidden');}
 function leadModalBgClick(e){if(e.target.id==='lead-modal')closeLeadModal();}
@@ -638,7 +778,11 @@ document.addEventListener('copy',e=>{
 });
 document.addEventListener('keydown',e=>{
   const modalOpen=!document.getElementById('lead-modal').classList.contains('hidden');
-  if(modalOpen&&(e.ctrlKey||e.metaKey)&&['a','c','x','s','p'].includes(e.key.toLowerCase()))e.preventDefault();
+  const detailOpen=!document.getElementById('sec-lead-detail').classList.contains('hidden');
+  if((modalOpen||detailOpen)&&(e.ctrlKey||e.metaKey)&&['a','c','x','s','p'].includes(e.key.toLowerCase())){
+    const tag=(e.target&&e.target.tagName)||'';
+    if(tag!=='TEXTAREA'&&tag!=='INPUT')e.preventDefault();
+  }
 });
 document.addEventListener('selectstart',e=>{if(e.target.closest('.lead-protected'))e.preventDefault();});
 document.addEventListener('dragstart',e=>{if(e.target.closest('.lead-protected'))e.preventDefault();});

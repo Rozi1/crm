@@ -541,6 +541,7 @@ input[type=file].form-control{padding:8px}
       <button class="filter-btn active" onclick="filterReports('all',this)">All</button>
       <button class="filter-btn" onclick="filterReports('pending',this)">Pending</button>
       <button class="filter-btn" onclick="filterReports('fulfilled',this)">Fulfilled</button>
+      <button class="filter-btn" onclick="filterReports('dismissed',this)">Dismissed</button>
     </div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>Agent</th><th>Customer Details</th><th>Status</th><th>Requested</th><th>Updated</th><th>Actions</th></tr></thead>
@@ -1118,22 +1119,39 @@ function renderReports(list){
     <tr>
       <td><div style="display:flex;align-items:center;gap:9px">${avatar(r.full_name||r.username,'26px','6px')}<div><div style="font-weight:600;font-size:13px">${esc(r.full_name)}</div><div style="font-size:11px;color:var(--muted)">${esc(r.username)}</div></div></div></td>
       <td style="max-width:220px;font-size:12.5px;color:var(--muted)">${trunc(r.customer_details,65)}</td>
-      <td><span class="badge ${r.status==='fulfilled'?'b-ok':'b-warn'}">${r.status}</span></td>
+      <td><span class="badge ${r.status==='fulfilled'?'b-ok':r.status==='dismissed'?'b-err':'b-warn'}">${r.status}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(r.created_at)}</td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(r.updated_at)}</td>
-      <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="viewReport(${JSON.stringify(r).replace(/"/g,'&quot;')})">View</button>${r.status==='pending'?`<button class="btn btn-success btn-sm" onclick="showFulfillReport(${r.id})">Upload Report</button>`:`<button class="btn btn-ghost btn-sm" onclick="downloadReport(${r.id})">Download</button>`}</div></td>
+      <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="viewReport(${JSON.stringify(r).replace(/"/g,'&quot;')})">View</button>${r.status==='pending'?`<button class="btn btn-success btn-sm" onclick="showFulfillReport(${r.id})">Upload Report</button><button class="btn btn-danger btn-sm" onclick="showDismissReport(${r.id})">Dismiss</button>`:r.status==='fulfilled'?`<button class="btn btn-ghost btn-sm" onclick="downloadReport(${r.id})">Download</button>`:''}</div></td>
     </tr>`).join('');
 }
 function viewReport(r){
   openModal('Report Request',`
     <div class="drow"><div class="dlbl">Agent</div><div class="dval">${esc(r.full_name)} <span style="color:var(--muted)">(${esc(r.username)})</span></div></div>
-    <div class="drow"><div class="dlbl">Status</div><div class="dval"><span class="badge ${r.status==='fulfilled'?'b-ok':'b-warn'}">${r.status}</span></div></div>
+    <div class="drow"><div class="dlbl">Status</div><div class="dval"><span class="badge ${r.status==='fulfilled'?'b-ok':r.status==='dismissed'?'b-err':'b-warn'}">${r.status}</span></div></div>
     <div class="drow"><div class="dlbl">Requested</div><div class="dval" style="color:var(--muted)">${fmt(r.created_at)}</div></div>
     <div class="drow"><div class="dlbl">Customer Details</div><div class="dval" style="white-space:pre-wrap;line-height:1.6">${esc(r.customer_details)}</div></div>
     ${r.admin_note?`<div class="drow"><div class="dlbl">Admin Note</div><div class="dval">${esc(r.admin_note)}</div></div>`:''}
     ${r.report_original_name?`<div class="drow"><div class="dlbl">Report File</div><div class="dval" style="color:var(--ok)">${esc(r.report_original_name)}</div></div>`:''}`,
     [{label:'Close',cls:'btn-ghost',action:closeModal},
-     ...(r.status==='pending'?[{label:'Upload Report',cls:'btn-success',action:()=>{closeModal();showFulfillReport(r.id);}}]:[{label:'Download Report',cls:'btn-primary',action:()=>downloadReport(r.id)}])]);
+     ...(r.status==='pending'?[
+       {label:'Upload Report',cls:'btn-success',action:()=>{closeModal();showFulfillReport(r.id);}},
+       {label:'Dismiss',cls:'btn-danger',action:()=>{closeModal();showDismissReport(r.id);}}
+     ]:r.status==='fulfilled'?[{label:'Download Report',cls:'btn-primary',action:()=>downloadReport(r.id)}]:[])  ]);
+}
+function showDismissReport(id){
+  openModal('Dismiss Report Request',`
+    <div style="display:flex;align-items:flex-start;gap:16px;padding:4px 0 16px"><div style="width:52px;height:52px;border-radius:14px;background:#fef2f2;border:1.5px solid #fecaca;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div style="flex:1"><div style="font-size:14.5px;font-weight:600;color:var(--text);line-height:1.5">Dismiss this report request?</div><div style="font-size:12.5px;color:var(--muted);margin-top:6px">The agent will be notified that their request was dismissed. This cannot be undone.</div></div></div>
+    <div class="form-group" style="margin-bottom:0"><label>Reason / Note to Agent <span style="color:var(--dim);font-weight:400;text-transform:none">(optional)</span></label><textarea class="form-control" id="dismiss-note" placeholder="e.g. Insufficient details provided, duplicate request…" style="min-height:90px"></textarea></div>`,
+    [{label:'Cancel',cls:'btn-ghost',action:closeModal},{label:'Dismiss Request',cls:'btn-danger',action:()=>dismissReport(id)}]);
+}
+async function dismissReport(id){
+  const note=(document.getElementById('dismiss-note')?.value||'').trim();
+  const r=await api(API+'/reports/'+id+'/dismiss',{method:'PUT',body:{admin_note:note}});
+  if(!r)return;
+  const d=await r.json();
+  if(r.ok){closeModal();loadReports();loadPendingActions();showFlash('Report request dismissed','warn');}
+  else showFlash(d.error||'Could not dismiss request','err');
 }
 function showFulfillReport(id){
   openModal('Upload Fulfilled Report',`

@@ -1,0 +1,26 @@
+# Database — never overwrite production data
+*.db
+*.db-shm
+*.db-wal
+
+# Uploaded files
+uploads/reports/
+uploads/temp/
+
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore

@@ -222,7 +222,12 @@ router.post('/leads/bulk-delete', (req, res) => {
   const validIds = ids.map(Number).filter(n => Number.isInteger(n) && n > 0);
   if (!validIds.length) return res.status(400).json({ error: 'Invalid IDs' });
   const placeholders = validIds.map(() => '?').join(',');
-  const count = db.prepare(`DELETE FROM leads WHERE id IN (${placeholders})`).run(...validIds).changes;
+  const count = db.transaction(() => {
+    db.prepare(`DELETE FROM lead_submissions WHERE lead_id IN (${placeholders})`).run(...validIds);
+    db.prepare(`DELETE FROM report_requests WHERE lead_id IN (${placeholders})`).run(...validIds);
+    db.prepare(`DELETE FROM lead_extractions WHERE lead_id IN (${placeholders})`).run(...validIds);
+    return db.prepare(`DELETE FROM leads WHERE id IN (${placeholders})`).run(...validIds).changes;
+  })();
   res.json({ message: `${count} lead(s) deleted`, count });
 });
 
@@ -243,6 +248,16 @@ router.post('/reports/:id/fulfill', reportUpload.single('report'), (req, res) =>
     UPDATE report_requests SET status='fulfilled', report_filename=?, report_original_name=?, admin_note=?, updated_at=CURRENT_TIMESTAMP WHERE id=?
   `).run(req.file.filename, req.file.originalname, req.body.admin_note || '', req.params.id);
   res.json({ message: 'Report fulfilled and delivered to agent' });
+});
+
+router.put('/reports/:id/dismiss', (req, res) => {
+  const { admin_note } = req.body;
+  const rpt = getDB().prepare('SELECT id, status FROM report_requests WHERE id=?').get(req.params.id);
+  if (!rpt) return res.status(404).json({ error: 'Report not found' });
+  if (rpt.status !== 'pending') return res.status(400).json({ error: 'Only pending requests can be dismissed' });
+  getDB().prepare(`UPDATE report_requests SET status='dismissed', admin_note=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`)
+    .run(admin_note || '', req.params.id);
+  res.json({ message: 'Report request dismissed' });
 });
 
 router.get('/reports/:id/download', (req, res) => {
