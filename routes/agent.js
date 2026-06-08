@@ -68,7 +68,7 @@ router.get('/leads', (req, res) => {
   const db = getDB();
   const { date } = req.query;
   let q = `
-    SELECT l.id, l.first_name, l.middle_name, l.last_name, l.phone, l.address, le.extraction_date, le.extraction_period, le.extracted_at
+    SELECT l.id, l.first_name, l.middle_name, l.last_name, l.phone, l.address, l.city, l.state, l.zipcode, l.ssn, le.extraction_date, le.extraction_period, le.extracted_at
     FROM leads l JOIN lead_extractions le ON l.id=le.lead_id WHERE le.user_id=?`;
   const params = [req.user.id];
   if (date) { q += ' AND le.extraction_date=?'; params.push(date); }
@@ -78,7 +78,7 @@ router.get('/leads', (req, res) => {
 
 router.get('/leads/:id', (req, res) => {
   const lead = getDB().prepare(`
-    SELECT l.id, l.first_name, l.middle_name, l.last_name, l.address, l.phone, le.extraction_date, le.extraction_period, le.extracted_at
+    SELECT l.id, l.first_name, l.middle_name, l.last_name, l.address, l.city, l.state, l.zipcode, l.ssn, l.phone, le.extraction_date, le.extraction_period, le.extracted_at
     FROM leads l JOIN lead_extractions le ON l.id=le.lead_id WHERE l.id=? AND le.user_id=?
   `).get(req.params.id, req.user.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found or not assigned to you' });

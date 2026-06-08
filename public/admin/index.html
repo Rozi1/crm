@@ -60,7 +60,7 @@ nav{flex:1;padding:10px 8px;overflow-y:auto}
 
 /* ══ MAIN ════════════════════════════════════════════ */
 .main{margin-left:var(--sb);flex:1;min-height:100vh;overflow-y:auto}
-.main-inner{padding:30px 34px;max-width:1400px}
+.main-inner{padding:24px 22px;max-width:1600px}
 .ph{margin-bottom:26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .ph-left .ph-title{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-.6px}
 .ph-left .ph-sub{font-size:13px;color:var(--muted);margin-top:4px}
@@ -198,6 +198,68 @@ input[type=file].form-control{padding:8px}
 
 /* ══ ALERTS ═════════════════════════════════════════ */
 .alert{padding:11px 16px;border-radius:9px;font-size:13px;margin-bottom:16px;line-height:1.5;display:flex;align-items:flex-start;gap:9px}
+
+/* ══ LEAD TABLE (modern card-table) ════════════════ */
+.leads-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh-sm)}
+.leads-table{width:100%;border-collapse:collapse}
+.leads-table thead tr{background:linear-gradient(135deg,#f8fafc,#f1f5f9)}
+.leads-table th{padding:11px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1.5px solid var(--border);white-space:nowrap}
+.leads-table td{padding:0;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.leads-table tr:last-child td{border-bottom:none}
+.lead-tr{cursor:pointer;transition:background .12s}
+.lead-tr:hover td{background:linear-gradient(90deg,#f0f4ff,#f8faff)!important}
+.lead-tr.row-selected td{background:#eef2ff!important}
+.lead-cell{padding:10px 14px;display:flex;align-items:center}
+/* Name cell */
+.lead-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#312e81,#4338ca);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11.5px;font-weight:800;flex-shrink:0;box-shadow:0 2px 6px rgba(67,56,202,.28);letter-spacing:-.3px}
+.lead-av.av-green{background:linear-gradient(135deg,#15803d,#16a34a)}
+.lead-av.av-orange{background:linear-gradient(135deg,#c2410c,#ea580c)}
+.lead-av.av-cyan{background:linear-gradient(135deg,#0369a1,#0891b2)}
+.lead-av.av-rose{background:linear-gradient(135deg,#9f1239,#e11d48)}
+.lead-name-wrap{min-width:0;margin-left:10px}
+.lead-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .12s}
+.lead-tr:hover .lead-name{color:var(--accent)}
+.lead-name-sub{font-size:11px;color:var(--dim);margin-top:1px}
+/* Status dot */
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px}
+.dot-green{background:#16a34a;box-shadow:0 0 0 2px #bbf7d0}
+.dot-grey{background:#94a3b8;box-shadow:0 0 0 2px #e2e8f0}
+/* Search bar */
+.leads-search{position:relative;flex:1;min-width:180px;max-width:280px}
+.leads-search input{width:100%;padding:8px 12px 8px 34px;background:#f8fafc;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s,background .2s}
+.leads-search input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(67,56,202,.08)}
+.leads-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none}
+
+/* ══ LEAD DETAIL DRAWER ═════════════════════════════ */
+.drawer-ov{position:fixed;inset:0;background:rgba(15,23,42,.32);z-index:800;backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .28s}
+.drawer-ov.open{opacity:1;pointer-events:auto}
+.lead-drawer{position:fixed;top:0;right:0;width:500px;max-width:96vw;height:100vh;background:#fff;z-index:801;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);box-shadow:-6px 0 40px rgba(15,23,42,.14),-1px 0 8px rgba(15,23,42,.05)}
+.lead-drawer.open{transform:translateX(0)}
+.ldr-head{padding:0;flex-shrink:0;background:linear-gradient(135deg,#312e81 0%,#4338ca 60%,#6366f1 100%);position:relative;overflow:hidden}
+.ldr-head::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06);top:-80px;right:-60px;pointer-events:none}
+.ldr-head::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05);bottom:-30px;left:10px;pointer-events:none}
+.ldr-head-inner{padding:20px 22px 18px;position:relative;z-index:1}
+.ldr-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;z-index:2}
+.ldr-close:hover{background:rgba(255,255,255,.28)}
+.ldr-avatar{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;flex-shrink:0;margin-bottom:12px;letter-spacing:-.5px}
+.ldr-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:-.4px;line-height:1.2}
+.ldr-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.ldr-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.9)}
+.ldr-body{flex:1;overflow-y:auto;padding:18px 22px 10px}
+.ldr-section{margin-bottom:18px}
+.ldr-section-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ldr-section-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+.ldr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ldr-field{background:#f8fafc;border:1px solid #e8edf5;border-radius:10px;padding:11px 13px;transition:border-color .15s}
+.ldr-field:hover{border-color:var(--accent-muted)}
+.ldr-field.span2{grid-column:1/-1}
+.ldr-flabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin-bottom:4px}
+.ldr-fval{font-size:13.5px;font-weight:600;color:var(--text);word-break:break-word}
+.ldr-fval.mono{font-family:monospace;font-size:13px;color:#1e40af}
+.ldr-fval.empty{color:var(--dim);font-weight:400}
+.ldr-assign-box{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1.5px solid var(--border);border-radius:12px;padding:16px}
+.ldr-assign-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.ldr-footer{padding:14px 22px;border-top:1px solid var(--border);background:#fafbfc;display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
 .alert-ok{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok-text)}
 .alert-err{background:var(--err-bg);border:1px solid var(--err-border);color:var(--err-text)}
 .alert-info{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info-text)}
@@ -505,19 +567,52 @@ input[type=file].form-control{padding:8px}
 
   <!-- LEADS -->
   <section id="sec-leads" class="hidden">
-    <div class="ph"><div class="ph-title">Leads</div><div class="ph-sub">Manage lead pool — upload CSV, view all assignments</div></div>
+    <div class="ph"><div class="ph-title">Leads</div><div class="ph-sub">Manage lead pool — upload CSV, click any row to view full details</div></div>
     <div class="toolbar">
       <button class="btn btn-primary" onclick="showUploadLeads()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Upload CSV</button>
-      <select class="form-control" id="batch-filter" style="width:230px" onchange="loadLeads()"><option value="">All Batches</option></select>
+      <select class="form-control" id="batch-filter" style="width:190px" onchange="loadLeads()"><option value="">All Batches</option></select>
+      <div class="leads-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="leads-search-input" placeholder="Search name, phone, SSN…" oninput="filterLeadsTable()">
+      </div>
       <button class="btn btn-ghost" onclick="loadLeads()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh</button>
     </div>
-    <div id="leads-count" style="color:var(--muted);font-size:12.5px;margin-bottom:10px"></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th style="width:40px"><div class="cb-wrap"><input type="checkbox" class="row-cb" id="cb-all" onchange="toggleSelectAll(this)" title="Select all"></div></th><th>Name</th><th>Phone</th><th>Address</th><th>Batch</th><th>Status</th><th>Assigned To</th><th>Date</th><th>Actions</th></tr></thead>
-      <tbody id="leads-tbody"></tbody>
-    </table></div>
+    <div id="leads-count" style="color:var(--muted);font-size:12.5px;margin-bottom:12px"></div>
+    <div class="leads-table-wrap">
+      <table class="leads-table">
+        <thead><tr>
+          <th style="width:40px"><div class="cb-wrap"><input type="checkbox" class="row-cb" id="cb-all" onchange="toggleSelectAll(this)" title="Select all"></div></th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Location</th>
+          <th>SSN</th>
+          <th>Batch</th>
+          <th>Status</th>
+          <th>Assigned To</th>
+          <th style="width:50px"></th>
+        </tr></thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
     <div class="pgn" id="leads-pagination"></div>
   </section>
+
+  <!-- LEAD DETAIL DRAWER -->
+  <div class="drawer-ov" id="lead-drawer-ov" onclick="closeLeadDrawer()"></div>
+  <div class="lead-drawer" id="lead-drawer">
+    <div class="ldr-head">
+      <button class="ldr-close" onclick="closeLeadDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="ldr-head-inner">
+        <div class="ldr-avatar" id="ldr-avatar">?</div>
+        <div class="ldr-name" id="ldr-name">—</div>
+        <div class="ldr-meta" id="ldr-meta"></div>
+      </div>
+    </div>
+    <div class="ldr-body" id="ldr-body">
+      <div style="text-align:center;padding:40px;color:var(--muted)">Select a lead to view details</div>
+    </div>
+    <div class="ldr-footer" id="ldr-footer"></div>
+  </div>
 
   <!-- BULK ACTION BAR -->
   <div class="bulk-bar" id="bulk-bar">
@@ -1017,20 +1112,150 @@ async function loadLeads(){
   if(!r)return;const d=await r.json();
   document.getElementById('leads-count').textContent=`Showing ${d.leads.length} of ${d.total} leads`;
   const tb=document.getElementById('leads-tbody');
-  if(!d.leads.length){tb.innerHTML=emptyRow(9,'No leads in this selection');renderPagination(0,100);return;}
-  tb.innerHTML=d.leads.map(l=>`
-    <tr id="lrow-${l.id}">
-      <td><div class="cb-wrap"><input type="checkbox" class="row-cb lead-cb" data-id="${l.id}" onchange="onLeadCbChange()"></div></td>
-      <td><strong style="color:var(--text)">${esc(l.first_name)} ${esc(l.middle_name||'')} ${esc(l.last_name)}</strong></td>
-      <td style="font-family:monospace;font-size:12.5px;color:var(--muted)">${esc(l.phone)||'—'}</td>
-      <td style="color:var(--muted);font-size:12px;max-width:200px">${trunc(l.address,38)||'—'}</td>
-      <td><span class="badge b-blue">${esc(l.batch_name)}</span></td>
-      <td><span class="badge ${l.extracted_by?'b-grey':'b-ok'}">${l.extracted_by?'Extracted':'Available'}</span></td>
-      <td style="color:var(--muted);font-size:12px">${l.extracted_by?esc(l.extracted_by):'—'}</td>
-      <td style="color:var(--muted);font-size:12px">${l.extraction_date||'—'}</td>
-      <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="showManageLead(${l.id})" title="View &amp; reassign"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Manage</button><button class="btn btn-danger btn-sm" onclick="deleteLead(${l.id})">Delete</button></div></td>
-    </tr>`).join('');
+  if(!d.leads.length){tb.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>No leads in this selection</p></div></td></tr>`;renderPagination(0,100);return;}
+  const avColors=['','av-green','av-orange','av-cyan','av-rose'];
+  tb.innerHTML=d.leads.map((l,i)=>{
+    const initials=((l.first_name||'').charAt(0)+(l.last_name||'').charAt(0)).toUpperCase();
+    const avCls=avColors[i%avColors.length];
+    const location=[l.city,l.state].filter(Boolean).join(', ')||'—';
+    const isAssigned=!!l.extracted_by;
+    return`<tr class="lead-tr${l.id===window._openDrawerLeadId?' row-selected':''}" id="lrow-${l.id}" onclick="openLeadDrawer(${l.id},this)">
+      <td><div class="lead-cell" style="padding:10px 14px" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb lead-cb" data-id="${l.id}" onchange="onLeadCbChange()"></div></td>
+      <td><div class="lead-cell">
+        <div class="lead-av ${avCls}">${initials||'?'}</div>
+        <div class="lead-name-wrap">
+          <div class="lead-name">${esc(l.first_name)} ${esc(l.middle_name?l.middle_name+' ':'')}${esc(l.last_name)}</div>
+          <div class="lead-name-sub">Lead #${l.id}</div>
+        </div>
+      </div></td>
+      <td><div class="lead-cell" style="font-family:monospace;font-size:12.5px;color:var(--muted)">${esc(l.phone)||'—'}</div></td>
+      <td><div class="lead-cell" style="color:var(--muted);font-size:12.5px">${esc(location)}</div></td>
+      <td><div class="lead-cell" style="font-family:monospace;font-size:12.5px;color:var(--muted)">${esc(l.ssn)||'—'}</div></td>
+      <td><div class="lead-cell"><span class="badge b-blue" style="font-size:11px">${esc(l.batch_name)}</span></div></td>
+      <td><div class="lead-cell"><span class="status-dot ${isAssigned?'dot-grey':'dot-green'}"></span><span style="font-size:12.5px;color:${isAssigned?'var(--muted)':'var(--ok-text)'};font-weight:600">${isAssigned?'Assigned':'Available'}</span></div></td>
+      <td><div class="lead-cell" style="color:var(--muted);font-size:12.5px">${l.extracted_by?esc(l.extracted_by):'—'}</div></td>
+      <td><div class="lead-cell" onclick="event.stopPropagation()"><button class="btn btn-danger btn-xs" onclick="deleteLead(${l.id})" title="Delete lead"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+    </tr>`;
+  }).join('');
+  filterLeadsTable();
   renderPagination(d.total,100);
+}
+
+function filterLeadsTable(){
+  const q=(document.getElementById('leads-search-input')?.value||'').toLowerCase().trim();
+  document.querySelectorAll('#leads-tbody .lead-tr').forEach(tr=>{
+    if(!q){tr.style.display='';return;}
+    const txt=tr.textContent.toLowerCase();
+    tr.style.display=txt.includes(q)?'':'none';
+  });
+}
+
+// ── Lead Detail Drawer ────────────────────────────────────────────────────────
+window._openDrawerLeadId=null;
+window._drawerAgents=null;
+
+async function openLeadDrawer(leadId,trEl){
+  window._openDrawerLeadId=leadId;
+  // highlight row
+  document.querySelectorAll('.lead-tr').forEach(r=>r.classList.remove('row-selected'));
+  if(trEl)trEl.classList.add('row-selected');
+  // open drawer immediately with loading state
+  document.getElementById('lead-drawer-ov').classList.add('open');
+  document.getElementById('lead-drawer').classList.add('open');
+  document.getElementById('ldr-avatar').textContent='…';
+  document.getElementById('ldr-name').textContent='Loading…';
+  document.getElementById('ldr-meta').innerHTML='';
+  document.getElementById('ldr-body').innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:180px;color:rgba(255,255,255,.6)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" style="animation:spin 1s linear infinite"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>`;
+  document.getElementById('ldr-footer').innerHTML='';
+  try{
+    const [lr,ar]=await Promise.all([
+      api(API+'/leads/'+leadId),
+      window._drawerAgents?Promise.resolve({ok:true,_cached:true}):api(API+'/users')
+    ]);
+    if(!lr||!lr.ok){const e=await lr.json();showFlash(e.error||'Failed to load lead','err');closeLeadDrawer();return;}
+    const l=await lr.json();
+    if(!window._drawerAgents){const agents=await ar.json();window._drawerAgents=agents.filter(u=>u.role==='agent');}
+    const agents=window._drawerAgents;
+    const fullName=[l.first_name,l.middle_name,l.last_name].filter(Boolean).join(' ');
+    const initials=((l.first_name||'').charAt(0)+(l.last_name||'').charAt(0)).toUpperCase();
+    const isAssigned=!!l.extracted_by;
+    // Header
+    document.getElementById('ldr-avatar').textContent=initials||'?';
+    document.getElementById('ldr-name').textContent=fullName||'Unknown Lead';
+    document.getElementById('ldr-meta').innerHTML=`
+      <span class="ldr-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Lead #${l.id}</span>
+      <span class="ldr-pill" style="background:${isAssigned?'rgba(148,163,184,.2)':'rgba(34,197,94,.2)'};border-color:${isAssigned?'rgba(148,163,184,.3)':'rgba(34,197,94,.3)'}"><span style="width:6px;height:6px;border-radius:50%;background:${isAssigned?'#94a3b8':'#22c55e'};display:inline-block"></span>${isAssigned?'Assigned':'Available'}</span>
+      ${l.batch_name?`<span class="ldr-pill">${esc(l.batch_name)}</span>`:''}
+    `;
+    // Body
+    const fld=(label,val,mono=false,full=false)=>`
+      <div class="ldr-field${full?' span2':''}">
+        <div class="ldr-flabel">${label}</div>
+        <div class="ldr-fval${mono?' mono':''}${!val||val==='—'?' empty':''}">${val||'—'}</div>
+      </div>`;
+    document.getElementById('ldr-body').innerHTML=`
+      <div class="ldr-section">
+        <div class="ldr-section-hd"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Personal Info</div>
+        <div class="ldr-grid">
+          ${fld('First Name',esc(l.first_name))}
+          ${fld('Middle Name',esc(l.middle_name)||'—')}
+          ${fld('Last Name',esc(l.last_name))}
+          ${fld('Phone',esc(l.phone),true)}
+          ${fld('SSN',esc(l.ssn),true)}
+        </div>
+      </div>
+      <div class="ldr-section">
+        <div class="ldr-section-hd"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Address</div>
+        <div class="ldr-grid">
+          ${fld('Street Address',esc(l.address),false,true)}
+          ${fld('City',esc(l.city))}
+          ${fld('State',esc(l.state))}
+          ${fld('Zipcode',esc(l.zipcode),true)}
+        </div>
+      </div>
+      <div class="ldr-section">
+        <div class="ldr-section-hd"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> Assignment</div>
+        <div class="ldr-assign-box">
+          <div class="ldr-assign-title">Assign / Reassign Lead</div>
+          <div class="form-group" style="margin-bottom:12px"><label>Agent</label>
+            <select class="form-control" id="ldr-agent">
+              <option value="">— Return to Pool (Unassign) —</option>
+              ${agents.map(a=>`<option value="${a.id}" ${a.id==l.extracted_by_id?'selected':''}>${esc(a.full_name)} (${esc(a.username)})${!a.is_active?' [Inactive]':''}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0"><label>Period</label>
+            <select class="form-control" id="ldr-period">
+              <option value="1" ${l.extraction_period==1?'selected':''}>Period 1 — Morning</option>
+              <option value="2" ${l.extraction_period==2?'selected':''}>Period 2 — Afternoon</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      ${l.extraction_date?`<div class="ldr-section"><div class="ldr-section-hd"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Extraction Info</div><div class="ldr-grid">${fld('Assigned To',esc(l.extracted_by||'—'))}${fld('Date',l.extraction_date||'—')}${fld('Period','Period '+(l.extraction_period||'—'))}</div></div>`:''}
+    `;
+    // Footer
+    document.getElementById('ldr-footer').innerHTML=`
+      <button class="btn btn-danger btn-sm" onclick="deleteLead(${l.id});closeLeadDrawer()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Delete</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="saveLeadAssignmentFromDrawer(${l.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Save Assignment</button>
+    `;
+  }catch(err){showFlash('Error: '+err.message,'err');closeLeadDrawer();}
+}
+
+function closeLeadDrawer(){
+  document.getElementById('lead-drawer-ov').classList.remove('open');
+  document.getElementById('lead-drawer').classList.remove('open');
+  document.querySelectorAll('.lead-tr').forEach(r=>r.classList.remove('row-selected'));
+  window._openDrawerLeadId=null;
+}
+
+async function saveLeadAssignmentFromDrawer(leadId){
+  const userId=document.getElementById('ldr-agent')?.value;
+  const period=document.getElementById('ldr-period')?.value;
+  const r=await api(API+'/leads/'+leadId+'/assign',{method:'PUT',body:{user_id:userId||null,period:parseInt(period)}});
+  if(!r)return;
+  const d=await r.json();
+  if(r.ok){closeLeadDrawer();loadLeads();loadBatches();showFlash(d.message,'ok');}
+  else showFlash(d.error,'err');
 }
 function renderPagination(total,limit){
   const pages=Math.ceil(total/limit),p=document.getElementById('leads-pagination');
@@ -1038,9 +1263,24 @@ function renderPagination(total,limit){
   p.innerHTML=`<button onclick="changePage(${leadsPage-1})" ${leadsPage<=1?'disabled':''}>‹ Prev</button><span>Page ${leadsPage} of ${pages}</span><button onclick="changePage(${leadsPage+1})" ${leadsPage>=pages?'disabled':''}>Next ›</button>`;
 }
 function changePage(p){leadsPage=p;loadLeads();}
+function downloadLeadTemplate(){
+  const headers='FirstName,MiddleName,LastName,Address,City,State,Zipcode,SSN,Phone';
+  const sample='John,Michael,Smith,123 Main St,Springfield,IL,62701,123-45-6789,(217) 555-0100';
+  const blob=new Blob([headers+'\n'+sample],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='leads_template.csv';a.click();URL.revokeObjectURL(a.href);
+}
 function showUploadLeads(){
   openModal('Upload Leads (CSV)',`
-    <div class="alert alert-info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg><span>Format: <code style="background:rgba(3,105,161,.1);padding:2px 6px;border-radius:4px">FirstName, MiddleName, LastName, Address, Phone</code> — header auto-detected.</span></div>
+    <div class="alert alert-info" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+        <span>Required column order: <code style="background:rgba(3,105,161,.1);padding:2px 6px;border-radius:4px">FirstName, MiddleName, LastName, Address, City, State, Zipcode, SSN, Phone</code> — header row is auto-detected.</span>
+      </div>
+      <button onclick="downloadLeadTemplate()" class="btn btn-ghost btn-sm" style="align-self:flex-start">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Template
+      </button>
+    </div>
     <div class="form-group"><label>Batch Name</label><input class="form-control" id="ul-batch" placeholder="e.g. May 2025 Batch"></div>
     <div class="form-group"><label>CSV File</label><input type="file" accept=".csv" class="form-control" id="ul-file"></div>`,
     [{label:'Cancel',cls:'btn-ghost',action:closeModal},{label:'Upload Leads',cls:'btn-primary',action:uploadLeads}]);
@@ -1358,11 +1598,16 @@ async function showManageLead(leadId){
   const ICON_LOC=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
   const ICON_PHONE=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.73a16 16 0 0 0 6 6.56l1.27-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
   const ICON_TAG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
+  const ICON_SSN=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
   openModal('Manage Lead — #'+l.id,`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
       <div class="ml-info-card">${ICON_USER}<span class="ml-ic-label">Full Name</span><div class="ml-ic-val">${esc(fullName)||'—'}</div></div>
       <div class="ml-info-card">${ICON_PHONE}<span class="ml-ic-label">Phone</span><div class="ml-ic-val" style="font-family:monospace;font-size:13px">${esc(l.phone)||'—'}</div></div>
       <div class="ml-info-card" style="grid-column:1/-1">${ICON_LOC}<span class="ml-ic-label">Address</span><div class="ml-ic-val">${esc(l.address)||'—'}</div></div>
+      <div class="ml-info-card">${ICON_LOC}<span class="ml-ic-label">City</span><div class="ml-ic-val">${esc(l.city)||'—'}</div></div>
+      <div class="ml-info-card">${ICON_LOC}<span class="ml-ic-label">State</span><div class="ml-ic-val">${esc(l.state)||'—'}</div></div>
+      <div class="ml-info-card">${ICON_LOC}<span class="ml-ic-label">Zipcode</span><div class="ml-ic-val" style="font-family:monospace">${esc(l.zipcode)||'—'}</div></div>
+      <div class="ml-info-card">${ICON_SSN}<span class="ml-ic-label">SSN</span><div class="ml-ic-val" style="font-family:monospace">${esc(l.ssn)||'—'}</div></div>
       <div class="ml-info-card">${ICON_TAG}<span class="ml-ic-label">Batch</span><div class="ml-ic-val"><span class="badge b-blue">${esc(l.batch_name)}</span></div></div>
       <div class="ml-info-card"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="ml-ic-label">Status</span><div class="ml-ic-val"><span class="badge ${l.extracted_by?'b-grey':'b-ok'}">${l.extracted_by?'Assigned to '+esc(l.extracted_by):'Available (Pool)'}</span></div></div>
     </div>

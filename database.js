@@ -55,6 +55,10 @@ function initDatabase() {
       middle_name TEXT DEFAULT '',
       last_name TEXT NOT NULL,
       address TEXT DEFAULT '',
+      city TEXT DEFAULT '',
+      state TEXT DEFAULT '',
+      zipcode TEXT DEFAULT '',
+      ssn TEXT DEFAULT '',
       phone TEXT DEFAULT '',
       batch_name TEXT DEFAULT 'Default',
       is_available INTEGER DEFAULT 1,
@@ -99,6 +103,13 @@ function initDatabase() {
       FOREIGN KEY (lead_id) REFERENCES leads(id)
     );
   `);
+
+  // Migration: add new lead fields if they don't exist yet
+  const leadCols = db.prepare("PRAGMA table_info(leads)").all().map(c => c.name);
+  if (!leadCols.includes('city'))    db.exec("ALTER TABLE leads ADD COLUMN city TEXT DEFAULT ''");
+  if (!leadCols.includes('state'))   db.exec("ALTER TABLE leads ADD COLUMN state TEXT DEFAULT ''");
+  if (!leadCols.includes('zipcode')) db.exec("ALTER TABLE leads ADD COLUMN zipcode TEXT DEFAULT ''");
+  if (!leadCols.includes('ssn'))     db.exec("ALTER TABLE leads ADD COLUMN ssn TEXT DEFAULT ''");
 
   const ins = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
   ins.run('kill_switch', 'false');

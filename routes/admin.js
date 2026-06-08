@@ -147,7 +147,7 @@ router.post('/leads/upload', csvUpload.single('file'), (req, res) => {
   try {
     const lines = fs.readFileSync(req.file.path, 'utf-8').split('\n').filter(l => l.trim());
     const db = getDB();
-    const ins = db.prepare('INSERT INTO leads (first_name,middle_name,last_name,address,phone,batch_name) VALUES (?,?,?,?,?,?)');
+    const ins = db.prepare('INSERT INTO leads (first_name,middle_name,last_name,address,city,state,zipcode,ssn,phone,batch_name) VALUES (?,?,?,?,?,?,?,?,?,?)');
     let inserted = 0, skipped = 0;
     const firstLine = lines[0].toLowerCase();
     const startIdx = (firstLine.includes('first') || firstLine.includes('name')) ? 1 : 0;
@@ -155,9 +155,9 @@ router.post('/leads/upload', csvUpload.single('file'), (req, res) => {
     const runInsert = db.transaction(() => {
       for (const line of lines.slice(startIdx)) {
         const p = parseCSVLine(line);
-        const [fn, mn, ln, addr, phone] = p;
+        const [fn, mn, ln, addr, city, state, zipcode, ssn, phone] = p;
         if (!fn && !ln) { skipped++; return; }
-        ins.run(fn || '', mn || '', ln || fn || '', addr || '', phone || '', batchName);
+        ins.run(fn || '', mn || '', ln || fn || '', addr || '', city || '', state || '', zipcode || '', ssn || '', phone || '', batchName);
         inserted++;
       }
     });
