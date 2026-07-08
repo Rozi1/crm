@@ -62,22 +62,23 @@ main section{animation:sec-fade .22s ease both}
 @keyframes sec-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* ── Period Cards ──────────────────────────── */
-.period-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
-.period-card{background:var(--card);border:1.5px solid rgba(226,232,240,.8);border-radius:var(--radius);padding:24px;box-shadow:0 2px 8px rgba(15,23,42,.05),0 6px 18px rgba(15,23,42,.07);transition:box-shadow .22s,transform .22s;position:relative;overflow:hidden}
-.period-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-g);border-radius:14px 14px 0 0}
+.period-grid{display:grid;grid-template-columns:1fr;max-width:480px;gap:18px;margin-bottom:22px}
+.period-card{background:var(--card);border:1.5px solid rgba(226,232,240,.8);border-radius:var(--radius);padding:26px;box-shadow:0 2px 8px rgba(15,23,42,.05),0 6px 18px rgba(15,23,42,.07);transition:box-shadow .22s,transform .22s,border-color .25s;position:relative;overflow:hidden}
+.period-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-g);border-radius:14px 14px 0 0;transition:background .25s}
 .period-card:hover{box-shadow:0 10px 32px rgba(15,23,42,.12);transform:translateY(-2px)}
-.pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.pc-title-group{display:flex;align-items:center;gap:11px}
+.pc-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-light);color:var(--accent);transition:background .25s,color .25s}
+.pc-icon.pc-icon-locked{background:var(--warn-bg);color:var(--warn-text)}
 .pc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
-.pc-period-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted)}
-.pc-counts{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.pc-period-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-muted);transition:all .25s}
+.pc-period-badge.pc-badge-locked{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-border)}
+.pc-counts{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
 .pc-extracted{font-size:40px;font-weight:900;line-height:1;letter-spacing:-1.5px;color:var(--text)}
 .pc-max{font-size:16px;color:var(--muted);font-weight:500}
-.pc-label-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.pc-label-sub{font-size:12.5px;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:6px}
 .bar-bg{background:#f1f5f9;border-radius:6px;height:7px;margin-bottom:18px;overflow:hidden}
 .bar-fill{height:100%;border-radius:6px;background:var(--accent-g);transition:width .6s cubic-bezier(.4,0,.2,1)}
-.period-card.pc-done{border-color:var(--ok-border)}
-.period-card.pc-done::before{background:linear-gradient(90deg,#15803d,#22c55e)}
-.period-card.pc-done .bar-fill{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .extract-btn{width:100%;padding:11px;border:none;border-radius:9px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
 .eb-can{background:var(--accent-g);color:#fff;box-shadow:0 3px 14px rgba(67,56,202,.32)}
 .eb-can:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 22px rgba(67,56,202,.42)}
@@ -283,23 +284,16 @@ select.form-control{cursor:pointer}
     <div class="period-grid">
       <div class="period-card" id="pc1">
         <div class="pc-header">
-          <div class="pc-label">Period 1 — Morning</div>
-          <div class="pc-period-badge">AM</div>
+          <div class="pc-title-group">
+            <div class="pc-icon" id="p1-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <div class="pc-label">Today's Extraction</div>
+          </div>
+          <div class="pc-period-badge" id="p1-badge">Ready</div>
         </div>
         <div class="pc-counts"><div class="pc-extracted" id="p1-val">—</div><div class="pc-max" id="p1-max">/ —</div></div>
         <div class="pc-label-sub" id="p1-sub">leads extracted</div>
         <div class="bar-bg"><div class="bar-fill" id="p1-bar" style="width:0%"></div></div>
-        <button class="extract-btn eb-wait" id="p1-btn" onclick="extractLeads(1)">Loading…</button>
-      </div>
-      <div class="period-card" id="pc2">
-        <div class="pc-header">
-          <div class="pc-label">Period 2 — Afternoon</div>
-          <div class="pc-period-badge">PM</div>
-        </div>
-        <div class="pc-counts"><div class="pc-extracted" id="p2-val">—</div><div class="pc-max" id="p2-max">/ —</div></div>
-        <div class="pc-label-sub" id="p2-sub">leads extracted</div>
-        <div class="bar-bg"><div class="bar-fill" id="p2-bar" style="width:0%"></div></div>
-        <button class="extract-btn eb-wait" id="p2-btn" onclick="extractLeads(2)">Loading…</button>
+        <button class="extract-btn eb-wait" id="p1-btn" onclick="extractLeads()">Loading…</button>
       </div>
     </div>
     <div class="mini-stats">
@@ -309,7 +303,7 @@ select.form-control{cursor:pointer}
     </div>
     <div class="alert alert-info">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-      <span><strong>How it works:</strong> Click Extract in each period to receive your leads for that slot. View leads in <strong>My Leads</strong>. Use <strong>Request Report</strong> to ask admin for a credit report, or <strong>Submit Lead</strong> to send banking details.</span>
+      <span><strong>How it works:</strong> You can extract leads once every 24 hours. Click Extract to receive your leads for the day. View leads in <strong>My Leads</strong>. Use <strong>Request Report</strong> to ask admin for a credit report, or <strong>Submit Lead</strong> to send banking details.</span>
     </div>
   </section>
 
@@ -325,8 +319,8 @@ select.form-control{cursor:pointer}
       </button>
     </div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>Lead Name</th><th>Phone</th><th>Address</th><th>City</th><th>State</th><th>Zipcode</th><th>SSN</th><th>Period</th><th>Action</th></tr></thead>
-      <tbody id="leads-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Loading…</p></div></td></tr></tbody>
+      <thead><tr><th>#</th><th>Lead Name</th><th>Phone</th><th>Address</th><th>City</th><th>State</th><th>Zipcode</th><th>SSN</th><th>Action</th></tr></thead>
+      <tbody id="leads-tbody"><tr><td colspan="9"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Loading…</p></div></td></tr></tbody>
     </table></div>
   </section>
 
@@ -467,6 +461,8 @@ document.querySelectorAll('.nav-item').forEach(el=>{
 });
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
+let countdownTimer=null;
+
 async function loadDashboard(){
   const r=await api(API+'/dashboard');if(!r)return;
   dashData=await r.json();const d=dashData;
@@ -474,46 +470,75 @@ async function loadDashboard(){
   document.getElementById('ms-total').textContent=d.totalLeadsAllTime;
   document.getElementById('ms-pending').textContent=d.pendingReports;
   document.getElementById('ms-fulfilled').textContent=d.fulfilledReports;
-  updatePeriodCard(1,d.period1,d.leadsPerPeriod,d.currentPeriod);
-  updatePeriodCard(2,d.period2,d.leadsPerPeriod,d.currentPeriod);
+  updateExtractCard(d);
   if(d.fulfilledReports>0){
     document.getElementById('dash-alert').innerHTML=`<div class="alert alert-ok"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg><span>You have <strong>${d.fulfilledReports}</strong> fulfilled report(s) ready to download in <strong>My History</strong>.</span></div>`;
   }
 }
 
-function updatePeriodCard(n,p,max,current){
-  const pct=max>0?Math.min(100,Math.round(p.extracted/max*100)):0;
-  document.getElementById('p'+n+'-val').textContent=p.extracted;
-  document.getElementById('p'+n+'-max').textContent='/ '+max+' leads';
-  document.getElementById('p'+n+'-sub').textContent=p.remaining===0?'All leads extracted!':(p.remaining)+' remaining';
-  document.getElementById('p'+n+'-bar').style.width=pct+'%';
-  const btn=document.getElementById('p'+n+'-btn');
-  const card=document.getElementById('pc'+n);
-  const isPeriod=current===n;
-  if(p.remaining===0){
-    btn.className='extract-btn eb-done';
-    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> All Leads Extracted`;
-    card.classList.add('pc-done');
-  }else if(!isPeriod){
-    btn.className='extract-btn eb-wait';
-    btn.textContent=n===1?'Available in morning period':'Available in afternoon period';
-  }else{
+const ICON_BOLT='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+const ICON_LOCK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+function fmtCountdown(ms){
+  if(ms<=0)return'available now';
+  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+  return h>0?`${h}h ${m}m`:`${m}m`;
+}
+
+function fmtLastExtracted(sqliteUTC){
+  if(!sqliteUTC)return null;
+  const dt=new Date(sqliteUTC.replace(' ','T')+'Z');
+  const sameDay=dt.toDateString()===new Date().toDateString();
+  const time=dt.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  return sameDay?`Last extracted today at ${time}`:`Last extracted ${dt.toLocaleDateString()} at ${time}`;
+}
+
+function updateExtractCard(d){
+  if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null;}
+  document.getElementById('p1-val').textContent=d.extractedToday;
+  document.getElementById('p1-max').textContent='/ '+d.leadsPerDay+' leads';
+  const pct=d.leadsPerDay>0?Math.min(100,Math.round(d.extractedToday/d.leadsPerDay*100)):0;
+  document.getElementById('p1-bar').style.width=pct+'%';
+  const btn=document.getElementById('p1-btn');
+  const badge=document.getElementById('p1-badge');
+  const icon=document.getElementById('p1-icon');
+  const sub=document.getElementById('p1-sub');
+  if(d.canExtract){
+    icon.classList.remove('pc-icon-locked');
+    icon.innerHTML=ICON_BOLT;
+    badge.classList.remove('pc-badge-locked');
+    badge.textContent='Ready';
+    sub.textContent=fmtLastExtracted(d.lastExtractionAt)||'Ready to pull today\'s batch';
     btn.className='extract-btn eb-can';
-    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> Extract ${p.remaining} Lead${p.remaining!==1?'s':''} Now`;
-    btn.setAttribute('data-period',n);
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> Extract Today's Leads`;
+  }else{
+    icon.classList.add('pc-icon-locked');
+    icon.innerHTML=ICON_LOCK;
+    badge.classList.add('pc-badge-locked');
+    badge.textContent='Locked';
+    sub.textContent=fmtLastExtracted(d.lastExtractionAt)||'Locked';
+    btn.className='extract-btn eb-wait';
+    btn.disabled=true;
+    const tick=()=>{
+      const remainingMs=new Date(d.nextAvailableAt).getTime()-Date.now();
+      if(remainingMs<=0){clearInterval(countdownTimer);loadDashboard();return;}
+      btn.innerHTML=`${ICON_LOCK} Available in ${fmtCountdown(remainingMs)}`;
+    };
+    tick();
+    countdownTimer=setInterval(tick,30000);
   }
 }
 
-async function extractLeads(periodHint){
-  if(!dashData)return;
-  const btn=document.getElementById('p'+dashData.currentPeriod+'-btn');
-  if(!btn||!btn.classList.contains('eb-can')){showFlash('Leads not available in the current period','warn');return;}
+async function extractLeads(){
+  if(!dashData||!dashData.canExtract)return;
+  const btn=document.getElementById('p1-btn');
   btn.disabled=true;btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".6s" repeatCount="indefinite"/></circle></svg> Extracting…`;
   const r=await api(API+'/leads/extract',{method:'POST'});
   if(!r){btn.disabled=false;return;}
   const d=await r.json();
   if(r.ok){showFlash(d.message,'ok');loadDashboard();}
-  else{showFlash(d.error||'Could not extract leads','err');btn.disabled=false;loadDashboard();}
+  else{showFlash(d.error||'Could not extract leads','err');loadDashboard();}
 }
 
 // ── My Leads ──────────────────────────────────────────────────────────────────
@@ -522,7 +547,7 @@ async function loadMyLeads(){
   const r=await api(API+'/leads'+(date?'?date='+date:''));if(!r)return;
   const leads=await r.json();const tb=document.getElementById('leads-tbody');
   if(!leads.length){
-    tb.innerHTML=`<tr><td colspan="10"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>${date?'No leads for this date':'No leads extracted yet'}</p><small>${date?'Try "Show All" to see all leads':'Go to Dashboard and click Extract Leads'}</small></div></td></tr>`;
+    tb.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>${date?'No leads for this date':'No leads extracted yet'}</p><small>${date?'Try "Show All" to see all leads':'Go to Dashboard and click Extract Leads'}</small></div></td></tr>`;
     return;
   }
   tb.innerHTML=leads.map((l,i)=>{
@@ -541,7 +566,6 @@ async function loadMyLeads(){
       <td style="color:var(--muted);font-size:12px">${esc(l.state)||'—'}</td>
       <td style="color:var(--muted);font-size:12px;font-family:monospace">${esc(l.zipcode)||'—'}</td>
       <td style="color:var(--muted);font-size:12px;font-family:monospace">${esc(l.ssn)||'—'}</td>
-      <td><span class="badge b-blue">Period ${l.extraction_period}</span></td>
       <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewLead(${l.id})">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         View
@@ -562,7 +586,6 @@ async function viewLead(id){
         <div style="flex:1;min-width:0">
           <div class="ld-name">${esc(fullName)||'Unknown Lead'}</div>
           <div class="ld-meta">
-            <span class="ld-meta-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Period ${l.extraction_period}</span>
             <span class="ld-meta-pill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Extracted ${fmtDate(l.extracted_at)}</span>
             <span class="ld-meta-pill">Lead #${l.id}</span>
           </div>

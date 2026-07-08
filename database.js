@@ -113,8 +113,15 @@ function initDatabase() {
 
   const ins = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
   ins.run('kill_switch', 'false');
-  ins.run('leads_per_period', '15');
-  ins.run('period_split_hour', '12');
+  ins.run('leads_per_day', '15');
+
+  // Migration: carry forward any previously configured per-period limit into the new
+  // single daily-extraction-window setting, then drop the retired period-based keys.
+  const oldLimit = db.prepare("SELECT value FROM settings WHERE key='leads_per_period'").get();
+  if (oldLimit) {
+    db.prepare("UPDATE settings SET value=? WHERE key='leads_per_day'").run(oldLimit.value);
+    db.prepare("DELETE FROM settings WHERE key IN ('leads_per_period','period_split_hour')").run();
+  }
 
   // One-time migration: promote all existing admins to superadmin if no superadmin exists yet
   const superAdminExists = db.prepare("SELECT id FROM users WHERE role = 'superadmin'").get();

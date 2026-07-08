@@ -9,24 +9,40 @@ router.use(authenticateToken);
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// SQLite CURRENT_TIMESTAMP is stored as 'YYYY-MM-DD HH:MM:SS' in UTC.
+function parseUTC(sqliteTimestamp) {
+  return new Date(sqliteTimestamp.replace(' ', 'T') + 'Z');
+}
+
+// An agent may run one extraction per rolling 24-hour window, measured from their
+// last extraction — not reset at midnight — so it can't be gamed at the day boundary.
+function getExtractionWindow(db, uid) {
+  const last = db.prepare("SELECT MAX(extracted_at) t FROM lead_extractions WHERE user_id=?").get(uid).t;
+  if (!last) return { canExtract: true, nextAvailableAt: null, lastExtractionAt: null };
+  const nextAvailableMs = parseUTC(last).getTime() + DAY_MS;
+  const canExtract = Date.now() >= nextAvailableMs;
+  return { canExtract, nextAvailableAt: canExtract ? null : new Date(nextAvailableMs).toISOString(), lastExtractionAt: last };
+}
+
 router.get('/dashboard', (req, res) => {
   const db = getDB();
   const today = new Date().toISOString().split('T')[0];
   const uid = req.user.id;
-  const splitHour = parseInt(db.prepare("SELECT value FROM settings WHERE key='period_split_hour'").get()?.value || '12');
-  const currentPeriod = new Date().getHours() < splitHour ? 1 : 2;
-  const leadsPerPeriod = parseInt(db.prepare("SELECT value FROM settings WHERE key='leads_per_period'").get()?.value || '15');
+  const leadsPerDay = parseInt(db.prepare("SELECT value FROM settings WHERE key='leads_per_day'").get()?.value || '15');
 
-  const p1 = db.prepare("SELECT COUNT(*) c FROM lead_extractions WHERE user_id=? AND extraction_date=? AND extraction_period=1").get(uid, today).c;
-  const p2 = db.prepare("SELECT COUNT(*) c FROM lead_extractions WHERE user_id=? AND extraction_date=? AND extraction_period=2").get(uid, today).c;
+  const window = getExtractionWindow(db, uid);
+  const extractedToday = db.prepare("SELECT COUNT(*) c FROM lead_extractions WHERE user_id=? AND extraction_date=?").get(uid, today).c;
   const pendingRpts = db.prepare("SELECT COUNT(*) c FROM report_requests WHERE user_id=? AND status='pending'").get(uid).c;
   const fulfilledRpts = db.prepare("SELECT COUNT(*) c FROM report_requests WHERE user_id=? AND status='fulfilled'").get(uid).c;
   const totalLeads = db.prepare("SELECT COUNT(*) c FROM lead_extractions WHERE user_id=?").get(uid).c;
 
   res.json({
-    today, currentPeriod, leadsPerPeriod, splitHour,
-    period1: { extracted: p1, remaining: Math.max(0, leadsPerPeriod - p1) },
-    period2: { extracted: p2, remaining: Math.max(0, leadsPerPeriod - p2) },
+    today, leadsPerDay, extractedToday,
+    canExtract: window.canExtract,
+    nextAvailableAt: window.nextAvailableAt,
+    lastExtractionAt: window.lastExtractionAt,
     pendingReports: pendingRpts,
     fulfilledReports: fulfilledRpts,
     totalLeadsAllTime: totalLeads
@@ -39,27 +55,27 @@ router.post('/leads/extract', (req, res) => {
   const db = getDB();
   const uid = req.user.id;
   const today = new Date().toISOString().split('T')[0];
-  const splitHour = parseInt(db.prepare("SELECT value FROM settings WHERE key='period_split_hour'").get()?.value || '12');
-  const currentPeriod = new Date().getHours() < splitHour ? 1 : 2;
-  const leadsPerPeriod = parseInt(db.prepare("SELECT value FROM settings WHERE key='leads_per_period'").get()?.value || '15');
+  const leadsPerDay = parseInt(db.prepare("SELECT value FROM settings WHERE key='leads_per_day'").get()?.value || '15');
 
-  const already = db.prepare("SELECT COUNT(*) c FROM lead_extractions WHERE user_id=? AND extraction_date=? AND extraction_period=?").get(uid, today, currentPeriod).c;
-  const remaining = leadsPerPeriod - already;
-
-  if (remaining <= 0) {
-    return res.status(400).json({ error: `You have already extracted all ${leadsPerPeriod} leads for this period.`, remaining: 0 });
+  const window = getExtractionWindow(db, uid);
+  if (!window.canExtract) {
+    return res.status(400).json({ error: 'You can only extract leads once every 24 hours.', nextAvailableAt: window.nextAvailableAt });
   }
 
-  const available = db.prepare("SELECT id FROM leads WHERE id NOT IN (SELECT lead_id FROM lead_extractions) LIMIT ?").all(remaining);
+  const available = db.prepare("SELECT id FROM leads WHERE id NOT IN (SELECT lead_id FROM lead_extractions) LIMIT ?").all(leadsPerDay);
 
   if (available.length === 0) {
     return res.status(400).json({ error: 'No leads are currently available. Please contact your administrator.' });
   }
 
-  const ins = db.prepare('INSERT INTO lead_extractions (user_id,lead_id,extraction_date,extraction_period) VALUES (?,?,?,?)');
-  db.transaction(() => { for (const l of available) ins.run(uid, l.id, today, currentPeriod); })();
+  const ins = db.prepare('INSERT INTO lead_extractions (user_id,lead_id,extraction_date,extraction_period) VALUES (?,?,?,1)');
+  db.transaction(() => { for (const l of available) ins.run(uid, l.id, today); })();
 
-  res.json({ message: `${available.length} lead(s) extracted successfully.`, count: available.length, remaining: remaining - available.length });
+  res.json({
+    message: `${available.length} lead(s) extracted successfully.`,
+    count: available.length,
+    nextAvailableAt: new Date(Date.now() + DAY_MS).toISOString()
+  });
 });
 
 // ─── My Leads ────────────────────────────────────────────────────────────────

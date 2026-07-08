@@ -112,6 +112,18 @@ router.delete('/users/:id', (req, res) => {
   res.json({ message: 'User deactivated' });
 });
 
+// ─── My Account ──────────────────────────────────────────────────────────────
+
+router.put('/me/password', (req, res) => {
+  const { current_password, new_password } = req.body;
+  if (!current_password) return res.status(400).json({ error: 'Current password is required' });
+  if (!new_password || new_password.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  const user = getDB().prepare('SELECT * FROM users WHERE id=?').get(req.user.id);
+  if (!bcrypt.compareSync(current_password, user.password)) return res.status(401).json({ error: 'Current password is incorrect' });
+  getDB().prepare('UPDATE users SET password=? WHERE id=?').run(bcrypt.hashSync(new_password, 10), req.user.id);
+  res.json({ message: 'Password changed successfully' });
+});
+
 // ─── Leads ───────────────────────────────────────────────────────────────────
 
 router.get('/leads/batches', (req, res) => {
@@ -194,7 +206,7 @@ router.get('/leads/:id', (req, res) => {
 });
 
 router.put('/leads/:id/assign', (req, res) => {
-  const { user_id, period } = req.body;
+  const { user_id } = req.body;
   const db = getDB();
   const lead = db.prepare('SELECT id FROM leads WHERE id=?').get(req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
@@ -203,8 +215,8 @@ router.put('/leads/:id/assign', (req, res) => {
     db.prepare('DELETE FROM lead_extractions WHERE lead_id=?').run(req.params.id);
     if (user_id) {
       db.prepare(
-        'INSERT INTO lead_extractions (lead_id, user_id, extraction_date, extraction_period, extracted_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)'
-      ).run(req.params.id, parseInt(user_id), today, parseInt(period) || 1);
+        'INSERT INTO lead_extractions (lead_id, user_id, extraction_date, extraction_period, extracted_at) VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP)'
+      ).run(req.params.id, parseInt(user_id), today);
     }
   })();
   res.json({ message: user_id ? 'Lead assigned successfully' : 'Lead returned to pool' });
@@ -377,20 +389,19 @@ router.get('/agents/:id/leads', (req, res) => {
 // ─── Super Admin: Force Assign Leads to Any Agent ─────────────────────────────
 
 router.post('/leads/force-extract', requireSuperAdmin, (req, res) => {
-  const { user_id, count, period } = req.body;
+  const { user_id, count } = req.body;
   if (!user_id || !count) return res.status(400).json({ error: 'user_id and count are required' });
   const db = getDB();
   const agent = db.prepare("SELECT id, full_name FROM users WHERE id=? AND role='agent'").get(user_id);
   if (!agent) return res.status(404).json({ error: 'Agent not found' });
   const today = new Date().toISOString().split('T')[0];
-  const extractPeriod = parseInt(period) || 1;
   const extractCount = Math.min(Math.max(parseInt(count), 1), 200);
   const available = db.prepare(
     'SELECT id FROM leads WHERE id NOT IN (SELECT lead_id FROM lead_extractions) ORDER BY RANDOM() LIMIT ?'
   ).all(extractCount);
   if (!available.length) return res.status(400).json({ error: 'No available leads in the pool' });
-  const ins = db.prepare('INSERT INTO lead_extractions (lead_id,user_id,extraction_date,extraction_period) VALUES (?,?,?,?)');
-  db.transaction(() => { available.forEach(l => ins.run(l.id, parseInt(user_id), today, extractPeriod)); })();
+  const ins = db.prepare('INSERT INTO lead_extractions (lead_id,user_id,extraction_date,extraction_period) VALUES (?,?,?,1)');
+  db.transaction(() => { available.forEach(l => ins.run(l.id, parseInt(user_id), today)); })();
   res.json({ message: `${available.length} leads force-assigned to ${agent.full_name}`, count: available.length });
 });
 
