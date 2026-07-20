@@ -37,7 +37,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.ht
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
 app.get('/agent', (req, res) => res.sendFile(path.join(__dirname, 'public', 'agent', 'index.html')));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3010;
 app.listen(PORT, () => {
   console.log(`\n${'='.repeat(50)}`);
   console.log(`  CRM System running at http://localhost:${PORT}`);
