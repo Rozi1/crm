@@ -26,9 +26,9 @@ RUN mkdir -p /data/uploads/reports /data/uploads/temp
 # Symlink uploads and db into /data so they survive container restarts
 RUN rm -rf uploads && ln -s /data/uploads uploads
 
-EXPOSE 3000
+EXPOSE 3010
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3010
 
 CMD ["node", "server.js"]
